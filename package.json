@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node lib/cli.js",
     "prepublishOnly": "yarn build",
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "cli": "ts-node -TH src/cli"
   },
   "dependencies": {
     "@rollup/plugin-typescript": "^8.3.0",
@@ -25,7 +26,8 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
-    "@types/yargs": "^17.0.4"
+    "@types/yargs": "^17.0.4",
+    "ts-node": "^10.4.0"
   },
   "files": [
     "*.md",
