@@ -35,6 +35,7 @@
   ],
   "author": "Ratson",
   "license": "MIT",
+  "repository": "cordova-plus/cordova-plus",
   "engines": {
     "node": ">= 12"
   },
