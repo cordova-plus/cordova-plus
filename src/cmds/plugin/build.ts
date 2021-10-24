@@ -11,10 +11,13 @@ export default {
   command: "build",
   describe: "Build plugin with TypeScript",
   builder(yargs) {
-    return yargs.option("cwd", { type: "string" }).option("watch", {
-      alias: "w",
-      type: "boolean",
-    });
+    return yargs
+      .option("cwd", { type: "string" })
+      .option("tsconfig", { type: "string" })
+      .option("watch", {
+        alias: "w",
+        type: "boolean",
+      });
   },
   async handler(opts) {
     if (opts.cwd) {
@@ -22,9 +25,11 @@ export default {
     }
 
     const tsconfig = tempy.file({ name: "tsconfig.json" });
+    const tsconfigBase = opts.tsconfig ??
+      require.resolve("../../../config/tsconfig.json");
 
     await fse.outputJSON(tsconfig, {
-      extends: require.resolve("../../../config/tsconfig.json"),
+      extends: tsconfigBase,
       include: [`${process.cwd()}/src/www/**/*`],
     });
 
@@ -61,4 +66,4 @@ export default {
     await bundle.write(outputOptions);
     await bundle.close();
   },
-} as CommandModule<{}, { cwd: string; watch: boolean }>;
+} as CommandModule<{}, { cwd?: string; tsconfig?: string; watch?: boolean }>;
