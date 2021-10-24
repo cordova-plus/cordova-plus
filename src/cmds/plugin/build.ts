@@ -11,7 +11,10 @@ export default {
   command: "build",
   describe: "Build plugin with TypeScript",
   builder(yargs) {
-    return yargs.option("cwd", { type: "string" });
+    return yargs.option("cwd", { type: "string" }).option("watch", {
+      alias: "w",
+      type: "boolean",
+    });
   },
   async handler(opts) {
     if (opts.cwd) {
@@ -40,8 +43,22 @@ export default {
       exports: "auto",
     } as const;
 
+    if (opts.watch) {
+      const watchOptions = {
+        ...inputOptions,
+        output: [outputOptions],
+      };
+      const watcher = rollup.watch(watchOptions);
+      watcher.on("event", ({ result }: any) => {
+        if (result) {
+          result.close();
+        }
+      });
+      return;
+    }
+
     const bundle = await rollup.rollup(inputOptions);
     await bundle.write(outputOptions);
     await bundle.close();
   },
-} as CommandModule<{}, { cwd: string }>;
+} as CommandModule<{}, { cwd: string; watch: boolean }>;
