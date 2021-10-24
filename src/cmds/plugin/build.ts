@@ -11,6 +11,11 @@ async function resolveTsconfig(tsconfig?: string) {
   if (tsconfig && await fse.pathExists(tsconfig)) {
     return tsconfig;
   }
+
+  if (await fse.pathExists("tsconfig.json")) {
+    return "./tsconfig.json";
+  }
+
   const tsconfigPath = tempy.file({ name: "tsconfig.json" });
   const tsconfigBase = require.resolve("../../../config/tsconfig.json");
 
