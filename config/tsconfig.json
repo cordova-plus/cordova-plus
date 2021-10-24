@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "target": "es5",
+    "lib": ["dom", "es2015"]
+  }
+}
