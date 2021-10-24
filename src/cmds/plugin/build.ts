@@ -7,6 +7,20 @@ import type { CommandModule } from "yargs";
 
 const require = createRequire(import.meta.url);
 
+async function resolveTsconfig(tsconfig?: string) {
+  if (tsconfig && await fse.pathExists(tsconfig)) {
+    return tsconfig;
+  }
+  const tsconfigPath = tempy.file({ name: "tsconfig.json" });
+  const tsconfigBase = require.resolve("../../../config/tsconfig.json");
+
+  await fse.outputJSON(tsconfigPath, {
+    extends: tsconfigBase,
+    include: [`${process.cwd()}/src/www/**/*`],
+  });
+  return tsconfigPath;
+}
+
 export default {
   command: "build",
   describe: "Build plugin with TypeScript",
@@ -24,15 +38,7 @@ export default {
       process.chdir(opts.cwd);
     }
 
-    const tsconfig = tempy.file({ name: "tsconfig.json" });
-    const tsconfigBase = opts.tsconfig ??
-      require.resolve("../../../config/tsconfig.json");
-
-    await fse.outputJSON(tsconfig, {
-      extends: tsconfigBase,
-      include: [`${process.cwd()}/src/www/**/*`],
-    });
-
+    const tsconfig = await resolveTsconfig(opts.tsconfig);
     const inputOptions = {
       input: "./src/www/index.ts",
       plugins: [
