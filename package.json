@@ -30,7 +30,8 @@
   "files": [
     "*.md",
     "lib",
-    "src"
+    "src",
+    "config"
   ],
   "author": "Ratson",
   "license": "MIT",
