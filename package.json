@@ -33,7 +33,7 @@
     "*.md",
     "lib",
     "src",
-    "config"
+    "plugin"
   ],
   "author": "Ratson",
   "license": "MIT",
