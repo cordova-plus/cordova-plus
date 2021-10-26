@@ -1,4 +1,3 @@
-// @ts-expect-error
 import PackageJson from "@npmcli/package-json";
 import jsonStableStringify from "json-stable-stringify";
 import type { CommandModule } from "yargs";
