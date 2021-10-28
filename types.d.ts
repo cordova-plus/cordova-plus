@@ -1,6 +1,8 @@
 declare module "@npmcli/package-json";
 
 declare module "cordova-common" {
+  import { ElementTree } from "elementtree";
+
   interface Plugin {
     name: string;
     spec: string;
@@ -11,10 +13,16 @@ declare module "cordova-common" {
 
   export class ConfigParser {
     constructor(path: string);
+    doc: ElementTree;
+    name(): string;
+    packageName(): string;
+    getAttribute(attr: any): any;
     getPlugin(id: string): Plugin | undefined;
     getPluginIdList(): string[];
     getPlugins(): Plugin[];
     getPreference(name: string, platform: string): string;
+    getAllowNavigations(): any[];
+    write();
   }
 
   export interface PluginInfo {
@@ -27,6 +35,31 @@ declare module "cordova-common" {
   }
 }
 
+declare module "cordova-lib" {
+  import { ConfigParser, PluginInfo } from "cordova-common";
+
+  export default {
+    binname: string,
+    configparser: ConfigParser,
+    PluginInfo,
+    cordova: {
+      findProjectRoot(opt_startDir?: srting);,
+      serve(port: string, hookOpts: any);,
+      projectMetadata: {
+        getPlatforms(projectRoot: string): Promise<{ name: string }>;,
+      },
+    },
+  };
+}
+
+declare module "cordova-lib/src/cordova/util.js" {
+  export default {
+    isCordova(dir?: string): string | false;,
+    projectConfig(projectDir: string): string | false;,
+    getProjectRoot(): string;,
+  };
+}
+
 declare module "cordova-lib/src/cordova/plugin/util.js" {
   import { PluginInfo } from "cordova-common";
 
@@ -34,3 +67,5 @@ declare module "cordova-lib/src/cordova/plugin/util.js" {
     projectRoot: string,
   ): Promise<Array<PluginInfo>>;
 }
+
+declare module "cordova-serve";
