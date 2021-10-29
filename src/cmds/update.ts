@@ -24,10 +24,11 @@ export default {
       await Promise.all(
         installedPlugins.filter((p) => opts.plugin.includes(p.id))
           .map(async (p) => {
-            const { content: pkg } = await PackageJson.load(p.dir).catch(() => {
-              content:
-              undefined;
-            });
+            const { content: pkg } = await PackageJson.load(p.dir).catch(
+              () => ({
+                content: undefined,
+              })
+            );
             return { ...p, pkg };
           }),
       );

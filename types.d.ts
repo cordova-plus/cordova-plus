@@ -1,4 +1,14 @@
-declare module "@npmcli/package-json";
+declare module "@npmcli/package-json" {
+  export default class PackageJson {
+    static load(path: string): Promise<PackageJson>;
+
+    get content(): any;
+
+    load(path: string): Promise<this>;
+
+    save(): Promise<void>;
+  }
+}
 
 declare module "cordova-common" {
   import { ElementTree } from "elementtree";
