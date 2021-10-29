@@ -80,7 +80,6 @@ export default {
   describe: "Run live reload server",
   builder(yargs) {
     return yargs
-      .option("cwd", { type: "string" })
       .option("id", { type: "string", desc: "Update widget id" })
       .option("platform", {
         alias: "p",
@@ -90,10 +89,6 @@ export default {
       });
   },
   async handler(opts) {
-    if (opts.cwd) {
-      process.chdir(opts.cwd);
-    }
-
     const bs = browserSync.create();
 
     const server = {
@@ -143,5 +138,5 @@ export default {
   },
 } as CommandModule<
   {},
-  { cwd?: string; id?: string; platform: "android" | "browser" | "ios" }
+  { id?: string; platform: "android" | "browser" | "ios" }
 >;

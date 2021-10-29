@@ -11,7 +11,6 @@ export default {
   describe: "Update plugins",
   builder(yargs) {
     return yargs
-      .option("cwd", { type: "string" })
       .option("plugin", {
         alias: "p",
         type: "array",
@@ -20,10 +19,6 @@ export default {
       });
   },
   async handler(opts) {
-    if (opts.cwd) {
-      process.chdir(opts.cwd);
-    }
-
     const installedPlugins = await getInstalledPlugins(".");
     const plugins: Array<PluginInfo & { pkg?: { name: string } }> =
       await Promise.all(
@@ -58,4 +53,4 @@ export default {
       await pkgJson.save();
     }
   },
-} as CommandModule<{}, { cwd?: string; plugin: Array<string> }>;
+} as CommandModule<{}, { plugin: Array<string> }>;

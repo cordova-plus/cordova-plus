@@ -31,7 +31,6 @@ export default {
   describe: "Build plugin with TypeScript",
   builder(yargs) {
     return yargs
-      .option("cwd", { type: "string" })
       .option("tsconfig", { type: "string" })
       .option("watch", {
         alias: "w",
@@ -39,10 +38,6 @@ export default {
       });
   },
   async handler(opts) {
-    if (opts.cwd) {
-      process.chdir(opts.cwd);
-    }
-
     const tsconfig = await resolveTsconfig(opts.tsconfig);
     const inputOptions = {
       input: "./src/www/index.ts",
@@ -77,4 +72,4 @@ export default {
     await bundle.write(outputOptions);
     await bundle.close();
   },
-} as CommandModule<{}, { cwd?: string; tsconfig?: string; watch?: boolean }>;
+} as CommandModule<{}, { tsconfig?: string; watch?: boolean }>;

@@ -16,17 +16,10 @@ export function formatPackageJson(pkgJson: any) {
 export default {
   command: "fmt",
   describe: "Format cordova property in package.json",
-  builder(yargs) {
-    return yargs.option("cwd", { type: "string" });
-  },
-  async handler(opts) {
-    if (opts.cwd) {
-      process.chdir(opts.cwd);
-    }
-
+  async handler() {
     const pkgJson = await PackageJson.load("./");
     if (formatPackageJson(pkgJson)) {
       await pkgJson.save();
     }
   },
-} as CommandModule<{}, { cwd?: string }>;
+} as CommandModule<{}, {}>;
