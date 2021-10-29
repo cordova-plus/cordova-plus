@@ -19,7 +19,7 @@ function loadCordovaConfig() {
 function updateCordovaConfig(opts: { src: string; id?: string } | null) {
   const cfg = loadCordovaConfig();
   const el = cfg.doc.find("content");
-  if (!el) return;
+  if (!el) return false;
   const root = cfg.doc.getroot();
   const a = el.attrib;
 
@@ -67,9 +67,12 @@ function updateCordovaConfig(opts: { src: string; id?: string } | null) {
     updates.map(([f]) => f());
   } else if (a.src_) { // restore
     updates.map(([, f]) => f());
+  } else {
+    return false;
   }
 
   cfg.write();
+  return true;
 }
 
 export default {
@@ -122,13 +125,20 @@ export default {
         return;
       }
       const externalUrl = r.options.getIn(["urls", "external"]);
-      updateCordovaConfig({ src: externalUrl, id: opts.id });
+      const updated = updateCordovaConfig({ src: externalUrl, id: opts.id });
 
       onExit(() => {
         updateCordovaConfig(null);
       });
 
-      await execa("cordova", ["prepare"]);
+      if (updated) {
+        await execa("cordova", [
+          "prepare",
+          opts.platform,
+          "--no-telemetry",
+          "--no-update-notifier",
+        ]);
+      }
     });
   },
 } as CommandModule<
