@@ -16,6 +16,7 @@ declare module "cordova-common" {
     doc: ElementTree;
     name(): string;
     packageName(): string;
+    setPackageName(id: string);
     getAttribute(attr: any): any;
     getPlugin(id: string): Plugin | undefined;
     getPluginIdList(): string[];

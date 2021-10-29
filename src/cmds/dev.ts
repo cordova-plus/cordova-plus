@@ -1,9 +1,11 @@
+import assert from "assert";
 import browserSync from "browser-sync";
 import cordovaLib from "cordova-lib";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
 import et from "elementtree";
-import type { CommandModule } from "yargs";
+import execa from "execa";
 import onExit from "signal-exit";
+import type { CommandModule } from "yargs";
 
 function loadCordovaConfig() {
   const rootDir = cordovaUtil.getProjectRoot();
@@ -14,33 +16,57 @@ function loadCordovaConfig() {
   return new cordovaLib.configparser(xml);
 }
 
-function updateContentSrc(src: string | null) {
+function updateCordovaConfig(opts: { src: string; id?: string } | null) {
   const cfg = loadCordovaConfig();
   const el = cfg.doc.find("content");
   if (!el) return;
+  const root = cfg.doc.getroot();
   const a = el.attrib;
 
   const elNav = cfg.doc.findall("./allow-navigation").find((e) => e.attrib.dev);
 
-  if (src) { // update src
-    if (a.src_) return;
-
+  const updateSrc = [() => {
+    assert(opts);
     a.src_ = a.src;
-    a.src = src;
+    a.src = opts.src;
+  }, () => {
+    a.src = a.src_;
+    delete a.src_;
+  }];
 
+  const updateId = [() => {
+    assert(opts);
+    if (opts.id) {
+      root.attrib.id_ = root.attrib.id;
+      root.attrib.id = opts.id;
+    }
+  }, () => {
+    if (root.attrib.id_) {
+      root.attrib.id = root.attrib.id_;
+      delete root.attrib.id_;
+    }
+  }];
+
+  const updateNav = [() => {
     if (!elNav) {
-      et.SubElement((cfg.doc as any).getroot(), "allow-navigation", {
+      et.SubElement(root, "allow-navigation", {
         href: "http://*/*",
         dev: "true",
       });
     }
-  } else if (a.src_) { // restore src
-    a.src = a.src_;
-    delete a.src_;
-
+  }, () => {
     if (elNav) {
       cfg.doc.getroot().remove(elNav);
     }
+  }];
+
+  const updates = [updateSrc, updateNav, updateId];
+
+  if (opts) { // update for dev
+    if (a.src_) return;
+    updates.map(([f]) => f());
+  } else if (a.src_) { // restore
+    updates.map(([, f]) => f());
   }
 
   cfg.write();
@@ -52,6 +78,7 @@ export default {
   builder(yargs) {
     return yargs
       .option("cwd", { type: "string" })
+      .option("id", { type: "string", desc: "Update widget id" })
       .option("platform", {
         alias: "p",
         choices: ["android", "browser", "ios"],
@@ -89,20 +116,22 @@ export default {
           },
         },
       ],
-    }, (err, r: any) => {
+    }, async (err, r: any) => {
       if (err) {
         console.error(err);
         return;
       }
       const externalUrl = r.options.getIn(["urls", "external"]);
-      updateContentSrc(externalUrl);
+      updateCordovaConfig({ src: externalUrl, id: opts.id });
 
       onExit(() => {
-        updateContentSrc(null);
+        updateCordovaConfig(null);
       });
+
+      await execa("cordova", ["prepare"]);
     });
   },
 } as CommandModule<
   {},
-  { cwd?: string; platform: "android" | "browser" | "ios" }
+  { cwd?: string; id?: string; platform: "android" | "browser" | "ios" }
 >;
