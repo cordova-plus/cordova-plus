@@ -36,14 +36,24 @@ function updateCordovaConfig(opts: { src: string; id?: string } | null) {
 
   const updateId = [() => {
     assert(opts);
-    if (opts.id) {
-      root.attrib.id_ = root.attrib.id;
-      root.attrib.id = opts.id;
-    }
+    if (!opts.id) return;
+
+    root.attrib.id_ = root.attrib.id;
+    root.attrib.id = opts.id;
+
+    if (cfg.android_packageName()) return;
+
+    root.attrib["android-packageName_dev"] = "true";
+    root.attrib["android-packageName"] = root.attrib.id_;
   }, () => {
-    if (root.attrib.id_) {
-      root.attrib.id = root.attrib.id_;
-      delete root.attrib.id_;
+    if (!root.attrib.id_) return;
+
+    root.attrib.id = root.attrib.id_;
+    delete root.attrib.id_;
+
+    if (root.attrib["android-packageName_dev"]) {
+      delete root.attrib["android-packageName"];
+      delete root.attrib["android-packageName_dev"];
     }
   }];
 

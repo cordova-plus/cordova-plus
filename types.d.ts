@@ -25,9 +25,10 @@ declare module "cordova-common" {
     constructor(path: string);
     doc: ElementTree;
     name(): string;
-    packageName(): string;
+    packageName(): string | undefined;
     setPackageName(id: string);
-    getAttribute(attr: any): any;
+    android_packageName(): string | undefined;
+    getAttribute(attr: string): any | undefined;
     getPlugin(id: string): Plugin | undefined;
     getPluginIdList(): string[];
     getPlugins(): Plugin[];
