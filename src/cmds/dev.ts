@@ -4,7 +4,9 @@ import cordovaLib from "cordova-lib";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
 import et from "elementtree";
 import execa from "execa";
+import serveHandler from "serve-handler";
 import onExit from "signal-exit";
+import uaParse from "ua-parser-js";
 import type { CommandModule } from "yargs";
 
 function loadCordovaConfig() {
@@ -85,32 +87,56 @@ function updateCordovaConfig(opts: { src: string; id?: string } | null) {
   return true;
 }
 
+const platformDirs = {
+  android: "./platforms/android/assets/www",
+  browser: "./platforms/browser/www",
+  ios: "./platforms/ios/www",
+};
+
+function resolvePlatform(userAgent?: string) {
+  const ua = uaParse(userAgent);
+  if (!userAgent) {
+    return "browser";
+  }
+
+  const platform = ua.os.name?.toLowerCase();
+  switch (platform) {
+    case "android":
+    case "ios":
+      return platform;
+  }
+  return "browser";
+}
+
 export default {
   command: "dev",
   describe: "Run live reload server",
   builder(yargs) {
     return yargs
-      .option("id", { type: "string", desc: "Update widget id" })
-      .option("platform", {
-        alias: "p",
-        choices: ["android", "browser", "ios"],
-        desc: "Targeting platform",
-        default: "browser",
-      });
+      .option("id", { type: "string", desc: "Update widget id" });
   },
   async handler(opts) {
     const bs = browserSync.create();
 
-    const server = {
-      android: "./platforms/android/assets/www",
-      browser: "./platforms/browser/www",
-      ios: "./platforms/ios/www",
-    }[opts.platform];
-
     bs.init({
-      server,
-      serveStatic: ["./www"],
+      server: "www",
       files: ["./www"],
+      middleware: [
+        (req, res, next) => {
+          const end = res.end;
+          res.end = (...args: never) => {
+            if (res.statusCode === 404) {
+              res.end = end;
+              const platform = resolvePlatform(req.headers["user-agent"]);
+              serveHandler(req, res, { public: platformDirs[platform] });
+            } else {
+              end.apply(res, args);
+            }
+          };
+
+          next();
+        },
+      ],
       cors: true,
       ghostMode: false,
       notify: false,
@@ -139,14 +165,10 @@ export default {
       if (updated) {
         await execa("cordova", [
           "prepare",
-          opts.platform,
           "--no-telemetry",
           "--no-update-notifier",
         ]);
       }
     });
   },
-} as CommandModule<
-  {},
-  { id?: string; platform: "android" | "browser" | "ios" }
->;
+} as CommandModule<{}, { id?: string }>;
