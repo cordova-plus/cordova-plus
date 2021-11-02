@@ -91,14 +91,10 @@ const platformDirs = {
   android: "./platforms/android/assets/www",
   browser: "./platforms/browser/www",
   ios: "./platforms/ios/www",
-};
+} as const;
 
-function resolvePlatform(userAgent?: string) {
+function resolvePlatform(userAgent?: string): keyof typeof platformDirs {
   const ua = uaParse(userAgent);
-  if (!userAgent) {
-    return "browser";
-  }
-
   const platform = ua.os.name?.toLowerCase();
   switch (platform) {
     case "android":
