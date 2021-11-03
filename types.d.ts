@@ -81,3 +81,12 @@ declare module "cordova-lib/src/cordova/plugin/util.js" {
 }
 
 declare module "cordova-serve";
+
+declare module "cordova-serve/src/util.js" {
+  export type platforms = Record<string, { www_dir: string }>;
+
+  export function getPlatformWwwRoot(
+    cordovaProjectRoot: string,
+    platformName: string,
+  ): string;
+}

@@ -2,6 +2,7 @@ import assert from "assert";
 import browserSync from "browser-sync";
 import cordovaLib from "cordova-lib";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
+import { getPlatformWwwRoot, platforms } from "cordova-serve/src/util.js";
 import et from "elementtree";
 import execa from "execa";
 import serveHandler from "serve-handler";
@@ -87,13 +88,7 @@ function updateCordovaConfig(opts: { src: string; id?: string } | null) {
   return true;
 }
 
-const platformDirs = {
-  android: "./platforms/android/assets/www",
-  browser: "./platforms/browser/www",
-  ios: "./platforms/ios/www",
-} as const;
-
-function resolvePlatform(userAgent?: string): keyof typeof platformDirs {
+function resolvePlatform(userAgent?: string): keyof platforms {
   const ua = uaParse(userAgent);
   const platform = ua.os.name?.toLowerCase();
   switch (platform) {
@@ -124,7 +119,8 @@ export default {
             if (res.statusCode === 404) {
               res.end = end;
               const platform = resolvePlatform(req.headers["user-agent"]);
-              serveHandler(req, res, { public: platformDirs[platform] });
+              const platformDir = getPlatformWwwRoot(".", platform);
+              serveHandler(req, res, { public: platformDir });
             } else {
               end.apply(res, args);
             }
