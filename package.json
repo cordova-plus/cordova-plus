@@ -4,6 +4,7 @@
   "description": "Productive command line for Cordova development",
   "main": "lib/index.js",
   "bin": "lib/cli.js",
+  "types": "index.d.ts",
   "type": "module",
   "scripts": {
     "start": "node lib/cli.js",
@@ -53,7 +54,8 @@
     "*.md",
     "lib",
     "src",
-    "plugin"
+    "plugin",
+    "*.ts"
   ],
   "author": "Ratson",
   "license": "MIT",

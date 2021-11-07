@@ -4,6 +4,10 @@
     "strict": true,
     "noImplicitAny": false,
     "target": "es5",
-    "lib": ["dom", "es2015"]
+    "lib": ["dom", "es2015"],
+    "moduleResolution": "node",
+    "paths": {
+      "cordova*": [".."]
+    }
   }
 }
