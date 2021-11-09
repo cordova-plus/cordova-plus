@@ -21,7 +21,7 @@ declare module "cordova-common" {
     };
   }
 
-  export class ConfigParser {
+  export declare class ConfigParser {
     constructor(path: string);
     doc: ElementTree;
     name(): string;
@@ -50,26 +50,30 @@ declare module "cordova-common" {
 declare module "cordova-lib" {
   import { ConfigParser, PluginInfo } from "cordova-common";
 
-  export default {
-    binname: string,
-    configparser: ConfigParser,
-    PluginInfo,
+  declare const _default: {
+    binname: string;
+    configparser: typeof ConfigParser;
+    PluginInfo: typeof PluginInfo;
     cordova: {
-      findProjectRoot(opt_startDir?: string): any;,
-      serve(port: string, hookOpts: any);,
+      findProjectRoot(opt_startDir?: string | undefined): any;
+      serve(port: string, hookOpts: any): any;
       projectMetadata: {
-        getPlatforms(projectRoot: string): Promise<{ name: string }>;,
-      },
-    },
+        getPlatforms(projectRoot: string): Promise<{
+          name: string;
+        }>;
+      };
+    };
   };
+  export default _default;
 }
 
 declare module "cordova-lib/src/cordova/util.js" {
-  export default {
-    isCordova(dir?: string): string | false;,
-    projectConfig(projectDir: string): string | false;,
-    getProjectRoot(): string;,
+  declare const _default: {
+    isCordova(dir?: string | undefined): string | false;
+    projectConfig(projectDir: string): string | false;
+    getProjectRoot(): string;
   };
+  export default _default;
 }
 
 declare module "cordova-lib/src/cordova/plugin/util.js" {
@@ -92,19 +96,20 @@ declare module "cordova-serve/src/util.js" {
 }
 
 declare module "cordova/channel" {
-  class Channel {
+  declare class Channel {
     constructor(type: string, sticky: boolean);
     subscribe(eventListenerOrFunction: any, eventListener?: any): void;
     unsubscribe(eventListenerOrFunction: any): void;
     fire(): void;
   }
 
-  export default {
-    createSticky(type: string): Channel;,
-    waitForInitialization(feature: string): void;,
-    initializationComplete(feature: string): void;,
-    onCordovaReady: Channel,
+  declare const _default: {
+    createSticky(type: string): Channel;
+    waitForInitialization(feature: string): void;
+    initializationComplete(feature: string): void;
+    onCordovaReady: Channel;
   };
+  export default _default;
 }
 
 declare module "cordova/exec" {
