@@ -55,7 +55,7 @@ declare module "cordova-lib" {
     configparser: ConfigParser,
     PluginInfo,
     cordova: {
-      findProjectRoot(opt_startDir?: srting);,
+      findProjectRoot(opt_startDir?: string): any;,
       serve(port: string, hookOpts: any);,
       projectMetadata: {
         getPlatforms(projectRoot: string): Promise<{ name: string }>;,
@@ -93,24 +93,26 @@ declare module "cordova-serve/src/util.js" {
 
 declare module "cordova/channel" {
   class Channel {
-    constructor(type: string, sticky: boolean) {}
-    subscribe(eventListenerOrFunction, eventListener?: any) {}
-    unsubscribe(eventListenerOrFunction) {}
-    fire() {}
+    constructor(type: string, sticky: boolean);
+    subscribe(eventListenerOrFunction: any, eventListener?: any): void;
+    unsubscribe(eventListenerOrFunction: any): void;
+    fire(): void;
   }
 
   export default {
-    createSticky(type: string): Channel {},
-    waitForInitialization(feature: string) {},
-    initializationComplete(feature: string) {},
-    onCordovaReady: new Channel(),
+    createSticky(type: string): Channel;,
+    waitForInitialization(feature: string): void;,
+    initializationComplete(feature: string): void;,
+    onCordovaReady: Channel,
   };
 }
 
 declare module "cordova/exec" {
+  import cordova from "cordova";
+
   export default cordova.exec;
 }
 
 interface Cordova {
-  fireDocumentEvent(eventName: string, data?: any);
+  fireDocumentEvent(eventName: string, data?: any): void;
 }
