@@ -90,3 +90,27 @@ declare module "cordova-serve/src/util.js" {
     platformName: string,
   ): string;
 }
+
+declare module "cordova/channel" {
+  class Channel {
+    constructor(type: string, sticky: boolean) {}
+    subscribe(eventListenerOrFunction, eventListener?: any) {}
+    unsubscribe(eventListenerOrFunction) {}
+    fire() {}
+  }
+
+  export default {
+    createSticky(type: string): Channel {},
+    waitForInitialization(feature: string) {},
+    initializationComplete(feature: string) {},
+    onCordovaReady: new Channel(),
+  };
+}
+
+declare module "cordova/exec" {
+  export default cordova.exec;
+}
+
+interface Cordova {
+  fireDocumentEvent(eventName: string, data?: any);
+}

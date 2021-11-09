@@ -5,9 +5,7 @@
     "noImplicitAny": false,
     "target": "es5",
     "lib": ["dom", "es2015"],
-    "moduleResolution": "node",
-    "paths": {
-      "cordova*": [".."]
-    }
-  }
+    "moduleResolution": "node"
+  },
+  "include": ["../types.d.ts"]
 }
