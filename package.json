@@ -17,7 +17,7 @@
     "@npmcli/package-json": "^1.0.1",
     "@rollup/plugin-typescript": "^8.3.0",
     "@types/cordova": "^0.0.34",
-    "@types/node": "^16.11.6",
+    "@types/node": "^16.11.7",
     "browser-sync": "^2.27.7",
     "cordova-android": "^10.1.1",
     "cordova-browser": "^6.0.0",

@@ -6,6 +6,22 @@ import _ from "lodash";
 import type { CommandModule } from "yargs";
 import { formatPackageJson } from "./fmt.js";
 
+export async function getPlugins() {
+  const installedPlugins = await getInstalledPlugins(".");
+  const plugins: Array<PluginInfo & { pkg?: { name: string } }> = await Promise
+    .all(
+      installedPlugins.map(async (p) => {
+        const { content: pkg } = await PackageJson.load(p.dir).catch(
+          () => ({
+            content: undefined,
+          }),
+        );
+        return { ...p, pkg };
+      }),
+    );
+  return plugins;
+}
+
 export default {
   command: "update",
   describe: "Update plugins",
@@ -19,24 +35,13 @@ export default {
       });
   },
   async handler(opts) {
-    const installedPlugins = await getInstalledPlugins(".");
-    const plugins: Array<PluginInfo & { pkg?: { name: string } }> =
-      await Promise.all(
-        installedPlugins.filter((p) => opts.plugin.includes(p.id))
-          .map(async (p) => {
-            const { content: pkg } = await PackageJson.load(p.dir).catch(
-              () => ({
-                content: undefined,
-              })
-            );
-            return { ...p, pkg };
-          }),
-      );
-
+    const plugins = await getPlugins();
     const pkgJson = await PackageJson.load("./");
     const { cordova } = pkgJson.content;
 
-    for await (const plugin of plugins) {
+    for await (
+      const plugin of plugins.filter((p) => opts.plugin.includes(p.id))
+    ) {
       const pluginName = plugin.pkg?.name ?? plugin.id;
       console.log(`Updating plugin: ${pluginName}`);
 
