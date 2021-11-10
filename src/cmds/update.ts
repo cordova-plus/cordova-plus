@@ -8,7 +8,9 @@ import { formatPackageJson } from "./fmt.js";
 
 export async function getPlugins() {
   const installedPlugins = await getInstalledPlugins(".");
-  const plugins: Array<PluginInfo & { pkg?: { name: string } }> = await Promise
+  const plugins: Array<
+    PluginInfo & { pkg?: { name: string; version: string } }
+  > = await Promise
     .all(
       installedPlugins.map(async (p) => {
         const { content: pkg } = await PackageJson.load(p.dir).catch(
