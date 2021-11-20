@@ -1,8 +1,8 @@
 import PackageJson from "@npmcli/package-json";
+import { execa } from "execa";
 import semver from "semver";
 import type { CommandModule } from "yargs";
 import { getPlugins } from "./update.js";
-import { execa } from "execa";
 
 async function npmListDeps() {
   try {
@@ -27,7 +27,7 @@ export default {
       ...pkgJson.content.devDependencies,
       ...pkgJson.content.dependencies,
     };
-    let issueCount = 0;
+    const issues: Record<string, boolean> = {};
 
     for (const plugin of plugins) {
       const { pkg } = plugin;
@@ -39,7 +39,7 @@ export default {
         console.warn(
           `${pkg.name}@${pkg.version} does not satisify with version in package.json: ${versionSpec}`,
         );
-        issueCount += 1;
+        issues[`pkg:${pkg.name}`] = true;
       }
     }
 
@@ -51,16 +51,21 @@ export default {
       if (!version) continue;
 
       if (version !== pkg.version) {
+        if (issues[`pkg:${pkg.name}`]) continue;
+
         console.warn(
           `${pkg.name}@${pkg.version} is not match npm installed version: ${version}`,
         );
-        issueCount += 1;
+        issues[`pkg:${pkg.name}`] = true;
       }
     }
 
+    const issueCount = Object.keys(issues).length;
     if (issueCount > 0) {
       console.warn(`Found ${issueCount} issue${issueCount > 1 ? "s" : ""}.`);
       process.exit(1);
+    } else {
+      console.log("No issues found");
     }
   },
 } as CommandModule<{}, {}>;
