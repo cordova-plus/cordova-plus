@@ -2,7 +2,7 @@ import PackageJson from "@npmcli/package-json";
 import semver from "semver";
 import type { CommandModule } from "yargs";
 import { getPlugins } from "./update.js";
-import execa from "execa";
+import { execa } from "execa";
 
 async function npmListDeps() {
   try {

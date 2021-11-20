@@ -1,7 +1,7 @@
 import PackageJson from "@npmcli/package-json";
 import type { PluginInfo } from "cordova-common";
 import { getInstalledPlugins } from "cordova-lib/src/cordova/plugin/util.js";
-import execa from "execa";
+import { execa } from "execa";
 import _ from "lodash";
 import type { CommandModule } from "yargs";
 import { formatPackageJson } from "./fmt.js";

@@ -1,5 +1,5 @@
 import PackageJson from "@npmcli/package-json";
-import execa from "execa";
+import { execa } from "execa";
 import fse from "fs-extra";
 import type { CommandModule } from "yargs";
 

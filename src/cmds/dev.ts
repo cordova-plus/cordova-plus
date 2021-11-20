@@ -4,7 +4,7 @@ import cordovaLib from "cordova-lib";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
 import { getPlatformWwwRoot, platforms } from "cordova-serve/src/util.js";
 import et from "elementtree";
-import execa from "execa";
+import { execa } from "execa";
 import serveHandler from "serve-handler";
 import onExit from "signal-exit";
 import uaParse from "ua-parser-js";
