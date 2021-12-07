@@ -42,7 +42,9 @@ export default {
     const { cordova } = pkgJson.content;
 
     for await (
-      const plugin of plugins.filter((p) => opts.plugin.includes(p.id))
+      const plugin of plugins.filter((p) =>
+        opts.plugin.length === 0 ? true : opts.plugin.includes(p.id)
+      )
     ) {
       const pluginName = plugin.pkg?.name ?? plugin.id;
       console.log(`Updating plugin: ${pluginName}`);
