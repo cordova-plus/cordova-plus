@@ -24,6 +24,15 @@ export async function getPlugins() {
   return plugins;
 }
 
+function runCordova(args: string[], opts?: any) {
+  const cwd = process.cwd();
+  return execa("cordova", [...args], {
+    cwd,
+    ...opts,
+    env: { NODE_OPTIONS: "" },
+  });
+}
+
 export default {
   command: "update",
   describe: "Update plugins",
@@ -49,14 +58,14 @@ export default {
       const pluginName = plugin.pkg?.name ?? plugin.id;
       console.log(`Updating plugin: ${pluginName}`);
 
-      await execa("cordova", ["plugin", "rm", plugin.id], { reject: false });
+      await runCordova(["plugin", "rm", plugin.id], { reject: false });
 
       const args = ["plugin", "add", pluginName];
       const vars = _.get(cordova, ["plugins", plugin.id], {});
       for (const [k, v] of Object.entries(vars)) {
         args.push("--variable", `${k}=${v}`);
       }
-      await execa("cordova", args);
+      await runCordova(args);
     }
 
     if (formatPackageJson(pkgJson)) {
