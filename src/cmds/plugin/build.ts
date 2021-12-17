@@ -69,7 +69,10 @@ export default {
     }
 
     const bundle = await rollup.rollup(inputOptions);
-    await bundle.write(outputOptions);
-    await bundle.close();
+    try {
+      await bundle.write(outputOptions);
+    } finally {
+      await bundle.close();
+    }
   },
 } as CommandModule<{}, { tsconfig?: string; watch?: boolean }>;
