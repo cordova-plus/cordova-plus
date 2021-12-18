@@ -17,7 +17,7 @@ async function resolveTsconfig(tsconfig?: string) {
   }
 
   const tsconfigPath = tempy.file({ name: "tsconfig.json" });
-  const tsconfigBase = require.resolve("../../../config/tsconfig.json");
+  const tsconfigBase = require.resolve("../../../plugin/tsconfig.json");
 
   await fse.outputJSON(tsconfigPath, {
     extends: tsconfigBase,
