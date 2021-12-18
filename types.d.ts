@@ -21,12 +21,12 @@ declare module "cordova-common" {
     };
   }
 
-  export declare class ConfigParser {
+  export class ConfigParser {
     constructor(path: string);
     doc: ElementTree;
     name(): string;
     packageName(): string | undefined;
-    setPackageName(id: string);
+    setPackageName(id: string): void;
     android_packageName(): string | undefined;
     getAttribute(attr: string): any | undefined;
     getPlugin(id: string): Plugin | undefined;
@@ -34,10 +34,10 @@ declare module "cordova-common" {
     getPlugins(): Plugin[];
     getPreference(name: string, platform: string): string;
     getAllowNavigations(): any[];
-    write();
+    write(): void;
   }
 
-  export interface PluginInfo {
+  export class PluginInfo {
     dir: string;
     filepath: string;
     id: string;
@@ -50,7 +50,7 @@ declare module "cordova-common" {
 declare module "cordova-lib" {
   import { ConfigParser, PluginInfo } from "cordova-common";
 
-  declare const _default: {
+  const _default: {
     binname: string;
     configparser: typeof ConfigParser;
     PluginInfo: typeof PluginInfo;
@@ -68,7 +68,7 @@ declare module "cordova-lib" {
 }
 
 declare module "cordova-lib/src/cordova/util.js" {
-  declare const _default: {
+  const _default: {
     isCordova(dir?: string | undefined): string | false;
     projectConfig(projectDir: string): string | false;
     getProjectRoot(): string;
@@ -96,14 +96,14 @@ declare module "cordova-serve/src/util.js" {
 }
 
 declare module "cordova/channel" {
-  declare class Channel {
+  class Channel {
     constructor(type: string, sticky: boolean);
     subscribe(eventListenerOrFunction: any, eventListener?: any): void;
     unsubscribe(eventListenerOrFunction: any): void;
     fire(): void;
   }
 
-  declare const _default: {
+  const _default: {
     createSticky(type: string): Channel;
     waitForInitialization(feature: string): void;
     initializationComplete(feature: string): void;
