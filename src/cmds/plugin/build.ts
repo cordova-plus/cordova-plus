@@ -26,6 +26,47 @@ async function resolveTsconfig(tsconfig?: string) {
   return tsconfigPath;
 }
 
+type Options = { input: string; tsconfig?: string; watch?: boolean };
+
+async function buildWww(opts: Options) {
+  const tsconfig = await resolveTsconfig(opts.tsconfig);
+  const inputOptions = {
+    input: opts.input,
+    plugins: [
+      typescript({
+        tsconfig,
+      }),
+    ],
+  };
+  const outputOptions = {
+    dir: "www",
+    format: "cjs",
+    sourcemap: false,
+    exports: "auto",
+  } as const;
+
+  if (opts.watch) {
+    const watchOptions = {
+      ...inputOptions,
+      output: [outputOptions],
+    };
+    const watcher = rollup.watch(watchOptions);
+    watcher.on("event", ({ result }: any) => {
+      if (result) {
+        result.close();
+      }
+    });
+    return;
+  }
+
+  const bundle = await rollup.rollup(inputOptions);
+  try {
+    await bundle.write(outputOptions);
+  } finally {
+    await bundle.close();
+  }
+}
+
 export default {
   command: "build",
   describe: "Build plugin with TypeScript",
@@ -39,41 +80,6 @@ export default {
       });
   },
   async handler(opts) {
-    const tsconfig = await resolveTsconfig(opts.tsconfig);
-    const inputOptions = {
-      input: opts.input,
-      plugins: [
-        typescript({
-          tsconfig,
-        }),
-      ],
-    };
-    const outputOptions = {
-      dir: "www",
-      format: "cjs",
-      sourcemap: false,
-      exports: "auto",
-    } as const;
-
-    if (opts.watch) {
-      const watchOptions = {
-        ...inputOptions,
-        output: [outputOptions],
-      };
-      const watcher = rollup.watch(watchOptions);
-      watcher.on("event", ({ result }: any) => {
-        if (result) {
-          result.close();
-        }
-      });
-      return;
-    }
-
-    const bundle = await rollup.rollup(inputOptions);
-    try {
-      await bundle.write(outputOptions);
-    } finally {
-      await bundle.close();
-    }
+    await buildWww(opts);
   },
-} as CommandModule<{}, { input: string; tsconfig?: string; watch?: boolean }>;
+} as CommandModule<{}, Options>;
