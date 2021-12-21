@@ -21,7 +21,10 @@ async function resolveTsconfig(tsconfig?: string) {
 
   await fse.outputJSON(tsconfigPath, {
     extends: tsconfigBase,
-    include: [`${process.cwd()}/src/www/**/*`],
+    include: [
+      require.resolve("../../../types.d.ts"),
+      `${process.cwd()}/src/www/**/*`,
+    ],
   });
   return tsconfigPath;
 }
