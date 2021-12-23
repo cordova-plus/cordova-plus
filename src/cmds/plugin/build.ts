@@ -1,4 +1,5 @@
 import typescript from "@rollup/plugin-typescript";
+import { execa } from "execa";
 import fse from "fs-extra";
 import { createRequire } from "module";
 import * as rollup from "rollup";
@@ -29,10 +30,14 @@ async function resolveTsconfig(tsconfig?: string) {
   return tsconfigPath;
 }
 
-type Options = { input: string; tsconfig?: string; watch?: boolean };
+type Options = {
+  input: string;
+  tsconfig?: string;
+  watch?: boolean;
+  lib: boolean;
+};
 
-async function buildWww(opts: Options) {
-  const tsconfig = await resolveTsconfig(opts.tsconfig);
+async function buildWww(tsconfig: string, opts: Options) {
   const inputOptions = {
     input: opts.input,
     plugins: [
@@ -70,6 +75,14 @@ async function buildWww(opts: Options) {
   }
 }
 
+async function buildLib(tsconfig: string, opts: Options) {
+  if (!opts.lib) return;
+
+  const args = ["-p", tsconfig, "--outDir", "lib"];
+  if (opts.watch) args.push("-w");
+  await execa("tsc", args, { stdio: "inherit" });
+}
+
 export default {
   command: "build",
   describe: "Build plugin with TypeScript",
@@ -80,9 +93,14 @@ export default {
       .option("watch", {
         alias: "w",
         type: "boolean",
-      });
+      })
+      .option("lib", { type: "boolean", default: false });
   },
   async handler(opts) {
-    await buildWww(opts);
+    const tsconfig = await resolveTsconfig(opts.tsconfig);
+    await Promise.all([
+      buildWww(tsconfig, opts),
+      buildLib(tsconfig, opts),
+    ]);
   },
 } as CommandModule<{}, Options>;
