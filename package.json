@@ -14,11 +14,13 @@
     "test": "tsd"
   },
   "dependencies": {
+    "@frat/envinfo": "^7.9.0",
     "@npmcli/package-json": "^1.0.1",
     "@rollup/plugin-typescript": "^8.3.0",
     "@types/cordova": "^0.0.34",
     "@types/node": "^16.11.9",
     "browser-sync": "^2.27.7",
+    "clipboardy": "^3.0.0",
     "cordova-android": "^10.1.1",
     "cordova-browser": "^6.0.0",
     "cordova-common": "^4.0.2",
