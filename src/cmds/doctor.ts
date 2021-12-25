@@ -21,8 +21,10 @@ export default {
   command: "doctor",
   describe: "Check project setup",
   async handler() {
-    const plugins = await getPlugins();
-    const pkgJson = await loadPackageJson();
+    const [plugins, pkgJson] = await Promise.all([
+      getPlugins(),
+      loadPackageJson(),
+    ]);
     const deps = {
       ...pkgJson.content.devDependencies,
       ...pkgJson.content.dependencies,
