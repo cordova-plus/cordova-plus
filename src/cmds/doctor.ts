@@ -1,7 +1,7 @@
-import PackageJson from "@npmcli/package-json";
 import { execa } from "execa";
 import semver from "semver";
 import type { CommandModule } from "yargs";
+import { loadPackageJson } from "./info.js";
 import { getPlugins } from "./update.js";
 
 async function npmListDeps() {
@@ -22,7 +22,7 @@ export default {
   describe: "Check project setup",
   async handler() {
     const plugins = await getPlugins();
-    const pkgJson = await PackageJson.load("./");
+    const pkgJson = await loadPackageJson();
     const deps = {
       ...pkgJson.content.devDependencies,
       ...pkgJson.content.dependencies,

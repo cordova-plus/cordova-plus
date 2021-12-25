@@ -1,9 +1,9 @@
-import PackageJson from "@npmcli/package-json";
 import type { PluginInfo } from "cordova-common";
 import { getInstalledPlugins } from "cordova-lib/src/cordova/plugin/util.js";
 import { execa } from "execa";
 import _ from "lodash";
 import type { CommandModule } from "yargs";
+import { loadPackageJson } from "./info.js";
 import { formatPackageJson } from "./fmt.js";
 
 export async function getPlugins() {
@@ -13,7 +13,7 @@ export async function getPlugins() {
   > = await Promise
     .all(
       installedPlugins.map(async (p) => {
-        const { content: pkg } = await PackageJson.load(p.dir).catch(
+        const { content: pkg } = await loadPackageJson(p.dir).catch(
           () => ({
             content: undefined,
           }),
@@ -47,7 +47,7 @@ export default {
   },
   async handler(opts) {
     const plugins = await getPlugins();
-    const pkgJson = await PackageJson.load("./");
+    const pkgJson = await loadPackageJson();
     const { cordova } = pkgJson.content;
 
     for await (

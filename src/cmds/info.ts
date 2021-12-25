@@ -4,6 +4,10 @@ import clipboardy from "clipboardy";
 import type { CommandModule } from "yargs";
 import { getPlugins } from "./update.js";
 
+export function loadPackageJson(root = "./") {
+  return PackageJson.load(root);
+}
+
 export default {
   command: "info",
   describe: "Get relevant version info about OS, toolchain and libraries",
@@ -18,7 +22,7 @@ export default {
   async handler(opts) {
     const [plugins, pkgJson] = await Promise.all([
       getPlugins(),
-      PackageJson.load("./"),
+      loadPackageJson(),
     ]);
     const deps = {
       ...pkgJson.content.devDependencies,

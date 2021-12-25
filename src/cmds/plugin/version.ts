@@ -1,7 +1,7 @@
-import PackageJson from "@npmcli/package-json";
 import { execa } from "execa";
 import fse from "fs-extra";
 import type { CommandModule } from "yargs";
+import { loadPackageJson } from "../info.js";
 
 async function updateCordovaPluginVersion(
   filename: string,
@@ -37,7 +37,7 @@ export default {
   command: "version",
   describe: "Update version in plugin.xml from package.json",
   async handler() {
-    const pkgJson = await PackageJson.load("./");
+    const pkgJson = await loadPackageJson();
     const { version: pkgVersion } = pkgJson.content;
     const { filename, before, after } = await updateCordovaPluginVersion(
       "plugin.xml",
