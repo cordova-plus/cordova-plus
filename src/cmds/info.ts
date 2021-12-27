@@ -28,6 +28,19 @@ export default {
       ...pkgJson.content.devDependencies,
       ...pkgJson.content.dependencies,
     };
+    const npmPackages = [
+      "cordova",
+      "ionic",
+      "typescript",
+    ].concat(
+      Object.keys(deps).filter((x) =>
+        x.startsWith("cordova-") || x.startsWith("ionic-") ||
+        x.startsWith("@ionic/")
+      ),
+    ).concat(
+      plugins.filter(({ pkg }) => pkg).map(({ pkg }) => pkg!.name),
+    );
+
     const info = await envinfo.run(
       {
         Binaries: ["Node", "Yarn", "npm", "Watchman"],
@@ -38,18 +51,7 @@ export default {
         System: ["OS", "CPU", "Memory", "Shell"],
         Utilities: ["Clang"],
         npmGlobalPackages: ["cordova", "ionic"],
-        npmPackages: [
-          "cordova",
-          "ionic",
-          "typescript",
-        ].concat(
-          Object.keys(deps).filter((x) =>
-            x.startsWith("cordova-") || x.startsWith("ionic-") ||
-            x.startsWith("@ionic/")
-          ),
-        ).concat(
-          plugins.filter(({ pkg }) => pkg).map(({ pkg }) => pkg!.name),
-        ),
+        npmPackages,
       },
       {
         console: true,
