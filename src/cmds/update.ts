@@ -46,8 +46,10 @@ export default {
       });
   },
   async handler(opts) {
-    const plugins = await getPlugins();
-    const pkgJson = await loadPackageJson();
+    const [plugins, pkgJson] = await Promise.all([
+      getPlugins(),
+      loadPackageJson(),
+    ]);
     const { cordova } = pkgJson.content;
 
     for await (
