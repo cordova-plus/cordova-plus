@@ -1,5 +1,6 @@
 import envinfo from "@frat/envinfo";
 import PackageJson from "@npmcli/package-json";
+import { isOptedIn } from "cordova/src/telemetry.js";
 import clipboardy from "clipboardy";
 import type { CommandModule } from "yargs";
 import { getPlugins } from "./update.js";
@@ -55,6 +56,14 @@ export default {
       },
       {
         console: true,
+        transform(x) {
+          return {
+            ...x,
+            Cordova: {
+              Telemetry: isOptedIn() ? "on" : "off",
+            },
+          };
+        },
       },
     );
 

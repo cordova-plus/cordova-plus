@@ -118,6 +118,14 @@ declare module "cordova/exec" {
   export default cordova.exec;
 }
 
+declare module "cordova/src/telemetry.js" {
+  export function hasUserOptedInOrOut(): boolean;
+  export function isOptedIn(): boolean;
+  export function clear(): void;
+  export function turnOff(): void;
+  export function turnOn(): void;
+}
+
 interface Cordova {
   fireDocumentEvent(eventName: string, data?: any): void;
 }

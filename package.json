@@ -21,6 +21,7 @@
     "@types/node": "^16.11.9",
     "browser-sync": "^2.27.7",
     "clipboardy": "^3.0.0",
+    "cordova": "^11.0.0",
     "cordova-android": "^10.1.1",
     "cordova-browser": "^6.0.0",
     "cordova-common": "^4.0.2",
