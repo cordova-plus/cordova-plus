@@ -129,3 +129,9 @@ declare module "cordova/src/telemetry.js" {
 interface Cordova {
   fireDocumentEvent(eventName: string, data?: any): void;
 }
+
+declare module "@npmcli/package-json" {
+  export default interface PackageJson {
+    update(content: unknown): PackageJson;
+  }
+}
