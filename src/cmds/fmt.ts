@@ -14,13 +14,17 @@ export function formatPackageJson(pkgJson: PackageJson) {
   return true;
 }
 
+export async function savePackageJson(pkgJson: PackageJson) {
+  if (formatPackageJson(pkgJson)) {
+    await pkgJson.save();
+  }
+}
+
 export default {
   command: "fmt",
   describe: "Format cordova property in package.json",
   async handler() {
     const pkgJson = await loadPackageJson();
-    if (formatPackageJson(pkgJson)) {
-      await pkgJson.save();
-    }
+    await savePackageJson(pkgJson);
   },
 } as CommandModule<{}, {}>;

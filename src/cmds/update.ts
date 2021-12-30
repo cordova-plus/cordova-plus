@@ -4,7 +4,7 @@ import { execa } from "execa";
 import _ from "lodash";
 import type { CommandModule } from "yargs";
 import { loadPackageJson } from "./info.js";
-import { formatPackageJson } from "./fmt.js";
+import { savePackageJson } from "./fmt.js";
 
 export async function getPlugins() {
   const installedPlugins = await getInstalledPlugins(".");
@@ -70,8 +70,6 @@ export default {
       await runCordova(args);
     }
 
-    if (formatPackageJson(pkgJson)) {
-      await pkgJson.save();
-    }
+    savePackageJson(pkgJson);
   },
 } as CommandModule<{}, { plugin: Array<string> }>;
