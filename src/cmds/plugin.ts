@@ -10,5 +10,6 @@ export default {
     return yargs.command(build).command(test).command(version).demandCommand();
   },
   handler() {
+    throw new Error("unreachable");
   },
 } as CommandModule;

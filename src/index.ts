@@ -11,6 +11,7 @@ async function cli() {
   yargs(process.argv.slice(2))
     .option("cwd", {
       type: "string",
+      desc: "Set current working directory",
       normalize: true,
       global: true,
       coerce(arg) {
