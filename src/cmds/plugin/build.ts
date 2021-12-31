@@ -40,12 +40,27 @@ type Options = {
 async function buildWww(tsconfig: string, opts: Options) {
   const inputOptions: rollup.InputOptions = {
     input: opts.input,
+    external: [
+      "cordova",
+      "cordova/channel",
+      "cordova/exec",
+    ],
     plugins: [
       typescript({
         tsconfig,
       }),
     ],
     onwarn(warning) {
+      const { message } = warning;
+      if (
+        message.indexOf("TS2304: Cannot find name 'cordova'.") > -1 ||
+        message.indexOf(
+            "TS2354: This syntax requires an imported helper but module 'tslib' cannot be found.",
+          ) > -1
+      ) {
+        return;
+      }
+
       console.log(warning.toString());
     },
   };

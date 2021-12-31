@@ -1,3 +1,5 @@
+/// <reference types="cordova" />
+
 declare module "@npmcli/package-json" {
   export default class PackageJson {
     static load(path: string): Promise<PackageJson>;
