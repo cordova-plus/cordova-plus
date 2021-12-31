@@ -38,23 +38,26 @@ type Options = {
 };
 
 async function buildWww(tsconfig: string, opts: Options) {
-  const inputOptions = {
+  const inputOptions: rollup.InputOptions = {
     input: opts.input,
     plugins: [
       typescript({
         tsconfig,
       }),
     ],
+    onwarn(warning) {
+      console.log(warning.toString());
+    },
   };
-  const outputOptions = {
+  const outputOptions: rollup.OutputOptions = {
     dir: "www",
     format: "cjs",
     sourcemap: false,
     exports: "auto",
-  } as const;
+  };
 
   if (opts.watch) {
-    const watchOptions = {
+    const watchOptions: rollup.RollupWatchOptions = {
       ...inputOptions,
       output: [outputOptions],
     };
