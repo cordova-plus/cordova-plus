@@ -81,7 +81,14 @@ async function buildWww(tsconfig: string, opts: Options) {
 async function buildLib(tsconfig: string, opts: Options) {
   if (!opts.lib) return;
 
-  const args = ["-p", tsconfig, "--outDir", "lib"];
+  const args = [
+    "-p",
+    tsconfig,
+    "--outDir",
+    "lib",
+    "--declaration",
+    "--sourceMap",
+  ];
   if (opts.watch) args.push("-w");
   await execa("tsc", args, { stdio: "inherit" });
 }
