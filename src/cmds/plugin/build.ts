@@ -8,7 +8,7 @@ import type { CommandModule } from "yargs";
 
 const require = createRequire(import.meta.url);
 
-async function resolveTsconfig(tsconfig?: string) {
+export async function resolveTsconfig(tsconfig?: string) {
   if (tsconfig && await fse.pathExists(tsconfig)) {
     return tsconfig;
   }
