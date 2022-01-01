@@ -13,5 +13,10 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["types.d.ts", "src/**/*.ts"]
+  "include": ["types.d.ts", "src/**/*.ts"],
+  "ts-node": {
+    "moduleTypes": {
+      "jest.config.ts": "cjs"
+    }
+  }
 }
