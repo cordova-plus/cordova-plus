@@ -37,6 +37,8 @@ type Options = {
   tsconfig?: string;
   watch?: boolean;
   lib: boolean;
+  "skip-warn": boolean;
+  skipWarn: boolean;
 };
 
 async function buildWww(tsconfig: string, opts: Options) {
@@ -57,10 +59,12 @@ async function buildWww(tsconfig: string, opts: Options) {
     onwarn(warning) {
       const { message } = warning;
       if (
-        message.indexOf("TS2304: Cannot find name 'cordova'.") > -1 ||
-        message.indexOf(
-            "TS2354: This syntax requires an imported helper but module 'tslib' cannot be found.",
-          ) > -1
+        opts.skipWarn && (
+          message.indexOf("TS2304: Cannot find name 'cordova'.") > -1 ||
+          message.indexOf(
+              "TS2354: This syntax requires an imported helper but module 'tslib' cannot be found.",
+            ) > -1
+        )
       ) {
         return;
       }
@@ -123,7 +127,8 @@ export default {
         alias: "w",
         type: "boolean",
       })
-      .option("lib", { type: "boolean", default: false });
+      .option("lib", { type: "boolean", default: false })
+      .option("skip-warn", { type: "boolean", default: true, hidden: true });
   },
   async handler(opts) {
     const tsconfig = await resolveTsconfig(opts.tsconfig);
