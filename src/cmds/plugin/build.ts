@@ -1,3 +1,5 @@
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import { execa } from "execa";
 import fse from "fs-extra";
@@ -46,9 +48,11 @@ async function buildWww(tsconfig: string, opts: Options) {
       "cordova/exec",
     ],
     plugins: [
+      nodeResolve(),
       typescript({
         tsconfig,
       }),
+      commonjs(),
     ],
     onwarn(warning) {
       const { message } = warning;
