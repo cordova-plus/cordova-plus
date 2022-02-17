@@ -115,7 +115,7 @@ export default {
       middleware: [
         (req, res, next) => {
           const end = res.end;
-          res.end = (...args: never) => {
+          res.end = ((...args: never) => {
             if (res.statusCode === 404) {
               res.end = end;
               const platform = resolvePlatform(req.headers["user-agent"]);
@@ -124,7 +124,7 @@ export default {
             } else {
               end.apply(res, args);
             }
-          };
+          }) as typeof end;
 
           next();
         },
