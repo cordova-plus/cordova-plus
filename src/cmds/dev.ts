@@ -8,7 +8,13 @@ import { execa } from "execa";
 import serveHandler from "serve-handler";
 import onExit from "signal-exit";
 import uaParse from "ua-parser-js";
+import { Logger } from "tslog";
 import type { CommandModule } from "yargs";
+
+const log = new Logger({
+  displayFilePath: "hidden",
+  displayFunctionName: false,
+});
 
 function loadCordovaConfig() {
   const rootDir = cordovaUtil.getProjectRoot();
@@ -120,6 +126,7 @@ export default {
               res.end = end;
               const platform = resolvePlatform(req.headers["user-agent"]);
               const platformDir = getPlatformWwwRoot(".", platform);
+              log.info(`Serve ${platform} in ${platformDir}`);
               serveHandler(req, res, { public: platformDir });
             } else {
               end.apply(res, args);
@@ -144,7 +151,7 @@ export default {
       ],
     }, async (err, r: any) => {
       if (err) {
-        console.error(err);
+        log.error(err);
         return;
       }
       const externalUrl = r.options.getIn(["urls", "external"]);
@@ -155,6 +162,7 @@ export default {
       });
 
       if (updated) {
+        log.info("Updated config.xml for dev");
         await execa("cordova", [
           "prepare",
           "--no-telemetry",
