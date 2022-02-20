@@ -138,11 +138,17 @@ export default {
         return;
       }
 
+      const platformDirs = new Map<string | undefined, string>();
       r.addMiddleware(
         "*",
         (req: http.IncomingMessage, res: http.ServerResponse) => {
-          const platform = resolvePlatform(req.headers["user-agent"]);
-          const platformDir = getPlatformWwwRoot(".", platform);
+          const userAgent = req.headers["user-agent"];
+          let platformDir = platformDirs.get(userAgent);
+          if (platformDir === undefined) {
+            const platform = resolvePlatform(userAgent);
+            platformDir = getPlatformWwwRoot(".", platform);
+            platformDirs.set(userAgent, platformDir);
+          }
           log.info(`Serve ${req.url} from ${platformDir}`);
           serveHandler(req, res, { public: platformDir });
         },
