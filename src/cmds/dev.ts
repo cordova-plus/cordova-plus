@@ -5,10 +5,11 @@ import cordovaUtil from "cordova-lib/src/cordova/util.js";
 import { getPlatformWwwRoot, platforms } from "cordova-serve/src/util.js";
 import et from "elementtree";
 import { execa } from "execa";
+import http from "http";
 import serveHandler from "serve-handler";
 import onExit from "signal-exit";
-import uaParse from "ua-parser-js";
 import { Logger } from "tslog";
+import uaParse from "ua-parser-js";
 import type { CommandModule } from "yargs";
 
 const log = new Logger({
@@ -118,24 +119,6 @@ export default {
     bs.init({
       server: "www",
       files: ["./www"],
-      middleware: [
-        (req, res, next) => {
-          const end = res.end;
-          res.end = ((...args: never) => {
-            if (res.statusCode === 404) {
-              res.end = end;
-              const platform = resolvePlatform(req.headers["user-agent"]);
-              const platformDir = getPlatformWwwRoot(".", platform);
-              log.info(`Serve ${platform} in ${platformDir}`);
-              serveHandler(req, res, { public: platformDir });
-            } else {
-              end.apply(res, args);
-            }
-          }) as typeof end;
-
-          next();
-        },
-      ],
       cors: true,
       ghostMode: false,
       notify: false,
@@ -154,6 +137,17 @@ export default {
         log.error(err);
         return;
       }
+
+      r.addMiddleware(
+        "*",
+        (req: http.IncomingMessage, res: http.ServerResponse) => {
+          const platform = resolvePlatform(req.headers["user-agent"]);
+          const platformDir = getPlatformWwwRoot(".", platform);
+          log.info(`Serve ${req.url} from ${platformDir}`);
+          serveHandler(req, res, { public: platformDir });
+        },
+      );
+
       const externalUrl = r.options.getIn(["urls", "external"]);
       const updated = updateCordovaConfig({ src: externalUrl, id: opts.id });
 
@@ -162,13 +156,15 @@ export default {
       });
 
       if (updated) {
-        log.info("Updated config.xml for dev");
+        log.info("Preparing project...");
         await execa("cordova", [
           "prepare",
           "--no-telemetry",
           "--no-update-notifier",
         ]);
       }
+
+      log.info("Ready for dev");
     });
   },
 } as CommandModule<{}, { id?: string }>;
