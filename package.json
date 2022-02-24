@@ -1,6 +1,6 @@
 {
   "name": "cordova-plus",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Productive command line for Cordova development",
   "main": "./lib/index.js",
   "bin": "./lib/cli.js",
