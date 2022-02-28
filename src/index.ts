@@ -9,6 +9,8 @@ import update from "./cmds/update.js";
 
 async function cli() {
   yargs(process.argv.slice(2))
+    .count("verbose")
+    .alias("v", "verbose")
     .option("cwd", {
       type: "string",
       desc: "Set current working directory",
