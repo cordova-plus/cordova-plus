@@ -180,7 +180,16 @@ export default {
             "--no-telemetry",
             "--no-update-notifier",
             "--verbose",
-          ], { stdio: opts.verbose > 0 ? "inherit" : "ignore" });
+            "--debug",
+            "--stacktrace",
+          ], {
+            stdio: opts.verbose > 0 ? "inherit" : "ignore",
+            env: {
+              NODE_ENV: "production",
+              npm_config_loglevel: "info",
+              npm_config_user_agent: "cordova-plus",
+            },
+          });
         }
 
         log.info("Ready for dev");
