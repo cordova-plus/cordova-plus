@@ -19,4 +19,4 @@ Options:
   --cwd      Set current working directory                              [string]
   --help     Show help                                                 [boolean]"
 `);
-});
+}, 1000 * 30);
