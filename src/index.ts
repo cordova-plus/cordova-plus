@@ -1,5 +1,6 @@
 import untildify from "untildify";
 import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 import dev from "./cmds/dev.js";
 import doctor from "./cmds/doctor.js";
 import fmt from "./cmds/fmt.js";
@@ -8,7 +9,7 @@ import plugin from "./cmds/plugin.js";
 import update from "./cmds/update.js";
 
 async function cli() {
-  yargs(process.argv.slice(2))
+  yargs(hideBin(process.argv))
     .count("verbose")
     .alias("v", "verbose")
     .option("cwd", {
