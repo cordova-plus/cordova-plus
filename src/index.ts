@@ -10,6 +10,7 @@ import update from "./cmds/update.js";
 
 async function cli() {
   yargs(hideBin(process.argv))
+    .scriptName("cordova-plus")
     .count("verbose")
     .alias("v", "verbose")
     .option("cwd", {
