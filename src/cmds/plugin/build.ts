@@ -5,7 +5,7 @@ import { execa } from "execa";
 import fse from "fs-extra";
 import { createRequire } from "module";
 import * as rollup from "rollup";
-import tempy from "tempy";
+import { temporaryFile } from "tempy";
 import type { CommandModule } from "yargs";
 
 const require = createRequire(import.meta.url);
@@ -19,7 +19,7 @@ export async function resolveTsconfig(tsconfig?: string) {
     return "./tsconfig.json";
   }
 
-  const tsconfigPath = tempy.file({ name: "tsconfig.json" });
+  const tsconfigPath = temporaryFile({ name: "tsconfig.json" });
   const tsconfigBase = require.resolve("../../../plugin/tsconfig.json");
 
   await fse.outputJSON(tsconfigPath, {
