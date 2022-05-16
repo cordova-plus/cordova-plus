@@ -16,6 +16,7 @@ export default async (): Promise<Config.InitialOptions> => ({
   testEnvironment: "node",
   testPathIgnorePatterns: [
     ...defaults.testPathIgnorePatterns,
+    "<rootDir>/.wireit/",
     "<rootDir>/lib/",
     "<rootDir>/src/cmds/plugin/test.ts",
   ],

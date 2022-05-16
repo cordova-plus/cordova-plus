@@ -9,11 +9,12 @@
   "scripts": {
     "start": "node lib/cli.js",
     "prepublishOnly": "yarn build",
-    "build": "tsc -b",
     "cli": "ts-node -TH src/cli.ts",
     "jest": "env NODE_OPTIONS=--experimental-vm-modules jest",
-    "pretest": "yarn build",
-    "test": "yarn jest && tsd"
+    "build": "wireit",
+    "test:jest": "wireit",
+    "test:tsd": "wireit",
+    "test": "wireit"
   },
   "dependencies": {
     "@frat/envinfo": "^7.10.0",
@@ -64,7 +65,8 @@
     "jest": "^28.1.0",
     "ts-jest": "^28.0.2",
     "ts-node": "^10.7.0",
-    "tsd": "^0.20.0"
+    "tsd": "^0.20.0",
+    "wireit": "^0.4.3"
   },
   "files": [
     "*.md",
@@ -83,5 +85,24 @@
   "keywords": [
     "cordova"
   ],
-  "packageManager": "yarn@3.2.1"
+  "packageManager": "yarn@3.2.1",
+  "wireit": {
+    "build": {
+      "command": "tsc -b && chmod +x lib/cli.js",
+      "clean": "if-file-deleted",
+      "files": ["src/**/*.ts", "tsconfig.json"],
+      "output": ["lib/**", "*.tsbuildinfo"]
+    },
+    "test:jest": {
+      "command": "yarn jest",
+      "dependencies": ["build"]
+    },
+    "test:tsd": {
+      "command": "tsd",
+      "dependencies": ["build"]
+    },
+    "test": {
+      "dependencies": ["test:jest", "test:tsd"]
+    }
+  }
 }
