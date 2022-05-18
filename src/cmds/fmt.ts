@@ -1,7 +1,6 @@
-import type PackageJson from "@npmcli/package-json";
+import PackageJson from "@npmcli/package-json";
 import jsonStableStringify from "json-stable-stringify";
 import type { CommandModule } from "yargs";
-import { loadPackageJson } from "./info.js";
 
 export function formatPackageJson(pkgJson: PackageJson) {
   const { cordova } = pkgJson.content;
@@ -21,10 +20,17 @@ export async function savePackageJson(pkgJson: PackageJson) {
 }
 
 export default {
-  command: "fmt",
+  command: "fmt [dirs..]",
   describe: "Format cordova property in package.json",
-  async handler() {
-    const pkgJson = await loadPackageJson();
-    await savePackageJson(pkgJson);
+  builder(yargs) {
+    return yargs.positional("dirs", {
+      array: true,
+      type: "string",
+      defaults: ["."],
+    });
   },
-} as CommandModule<{}, {}>;
+  async handler(args) {
+    const pkgs: PackageJson[] = await Promise.all(args.dirs.map(PackageJson.load))
+    await Promise.all(pkgs.map(savePackageJson))
+  },
+} as CommandModule<{}, { dirs: Array<string> }>;
