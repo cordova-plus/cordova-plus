@@ -6,8 +6,12 @@ export function formatPackageJson(pkgJson: PackageJson) {
   const { cordova } = pkgJson.content;
   if (!cordova) return false;
 
+  const d = JSON.parse(jsonStableStringify(cordova));
+  if (Array.isArray(d.platforms)) {
+    d.platforms.sort();
+  }
   pkgJson.update({
-    cordova: JSON.parse(jsonStableStringify(cordova)),
+    cordova: d,
   });
 
   return true;
@@ -30,7 +34,9 @@ export default {
     });
   },
   async handler(args) {
-    const pkgs: PackageJson[] = await Promise.all(args.dirs.map(PackageJson.load))
-    await Promise.all(pkgs.map(savePackageJson))
+    const pkgs: PackageJson[] = await Promise.all(
+      args.dirs.map(PackageJson.load),
+    );
+    await Promise.all(pkgs.map(savePackageJson));
   },
 } as CommandModule<{}, { dirs: Array<string> }>;
