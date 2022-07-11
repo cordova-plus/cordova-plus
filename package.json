@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node lib/cli.js",
     "prepublishOnly": "yarn build",
-    "cli": "ts-node -TH src/cli.ts",
+    "cli": "ts-node src/cli.ts",
     "jest": "env NODE_OPTIONS=--experimental-vm-modules jest",
     "build": "wireit",
     "test:jest": "wireit",

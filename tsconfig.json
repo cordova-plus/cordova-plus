@@ -16,6 +16,8 @@
   },
   "include": ["types.d.ts", "src/**/*.ts"],
   "ts-node": {
+    "esm": true,
+    "transpileOnly": true,
     "moduleTypes": {
       "jest.config.ts": "cjs"
     }
