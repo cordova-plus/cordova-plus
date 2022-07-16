@@ -8,7 +8,7 @@ test("cli", async () => {
 Commands:
   cordova-plus dev               Run live reload server
   cordova-plus doctor            Check project setup
-  cordova-plus fmt               Format cordova property in package.json
+  cordova-plus fmt [dirs..]      Format cordova property in package.json
   cordova-plus info              Get relevant version info about OS, toolchain a
                                  nd libraries
   cordova-plus plugin <command>  Commands for plugin development
