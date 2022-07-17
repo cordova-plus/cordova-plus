@@ -37,6 +37,7 @@ type Options = {
   tsconfig?: string;
   watch?: boolean;
   lib: boolean;
+  esm: boolean;
   "skip-warn": boolean;
   skipWarn: boolean;
 };
@@ -107,13 +108,18 @@ async function buildLib(tsconfig: string, opts: Options) {
   const args = [
     "-p",
     tsconfig,
-    "--outDir",
-    "lib",
     "--declaration",
     "--sourceMap",
   ];
   if (opts.watch) args.push("-w");
-  await execa("tsc", args, { stdio: "inherit" });
+
+  await execa("tsc", [...args, "--outDir", "lib"], { stdio: "inherit" });
+
+  if (opts.esm) {
+    await execa("tsc", [...args, "--outDir", "esm", "--module", "es2022"], {
+      stdio: "inherit",
+    });
+  }
 }
 
 export default {
@@ -128,6 +134,7 @@ export default {
         type: "boolean",
       })
       .option("lib", { type: "boolean", default: false })
+      .option("esm", { type: "boolean", default: true })
       .option("skip-warn", { type: "boolean", default: true, hidden: true });
   },
   async handler(opts) {
