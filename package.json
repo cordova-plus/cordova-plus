@@ -63,6 +63,7 @@
     "@types/ua-parser-js": "^0.7.36",
     "@types/yargs": "^17.0.10",
     "jest": "^28.1.2",
+    "plugman": "^3.0.1",
     "ts-jest": "^28.0.5",
     "ts-node": "^10.8.1",
     "tsd": "^0.22.0",

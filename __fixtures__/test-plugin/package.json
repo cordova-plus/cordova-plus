@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "test-plugin",
+  "version": "0.0.0",
+  "cordova": {
+    "id": "test-plugin",
+    "platforms": []
+  }
+}
