@@ -1,11 +1,11 @@
-import assert from "assert";
 import browserSync from "browser-sync";
 import cordovaLib from "cordova-lib";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
 import { getPlatformWwwRoot, platforms } from "cordova-serve/src/util.js";
 import et from "elementtree";
 import { execa } from "execa";
-import http from "http";
+import assert from "node:assert";
+import http from "node:http";
 import serveHandler from "serve-handler";
 import onExit from "signal-exit";
 import { Logger } from "tslog";
@@ -53,7 +53,11 @@ function updateCordovaConfig(opts: { src: string; id?: string } | null) {
       if (!opts.id) return;
 
       root.attrib.id_ = root.attrib.id;
-      root.attrib.id = opts.id;
+      root.attrib.id = opts.id.startsWith(".")
+        ? root.attrib.id + opts.id
+        : opts.id;
+
+      log.info(`Change widget id to "${root.attrib.id}"`);
 
       if (cfg.android_packageName()) return;
 
@@ -121,7 +125,13 @@ export default {
   command: "dev",
   describe: "Run live reload server",
   builder(yargs) {
-    return yargs.option("id", { type: "string", desc: "Update widget id" });
+    return yargs.option("id", {
+      type: "string",
+      desc: "Update widget id for developement",
+    }).example(
+      "$0 dev --id .dev",
+      "Development with suffix `.dev` as widget id",
+    );
   },
   async handler(opts) {
     const bs = browserSync.create();
