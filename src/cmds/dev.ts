@@ -26,8 +26,10 @@ function loadCordovaConfig() {
   return new cordovaLib.configparser(xml);
 }
 
-function updateCordovaConfig(opts: { src: string; id?: string } | null) {
-  const cfg = loadCordovaConfig();
+function updateCordovaConfig(
+  cfg: ReturnType<typeof loadCordovaConfig>,
+  opts: { src: string; id?: string } | null,
+) {
   const el = cfg.doc.find("content");
   if (!el) return false;
   const root = cfg.doc.getroot();
@@ -134,6 +136,8 @@ export default {
     );
   },
   async handler(opts) {
+    const cfg = loadCordovaConfig();
+
     const bs = browserSync.create();
 
     bs.init(
@@ -177,10 +181,13 @@ export default {
         );
 
         const externalUrl = r.options.getIn(["urls", "external"]);
-        const updated = updateCordovaConfig({ src: externalUrl, id: opts.id });
+        const updated = updateCordovaConfig(cfg, {
+          src: externalUrl,
+          id: opts.id,
+        });
 
         onExit(() => {
-          updateCordovaConfig(null);
+          updateCordovaConfig(cfg, null);
         });
 
         if (updated) {
