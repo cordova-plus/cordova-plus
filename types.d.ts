@@ -46,6 +46,7 @@ declare module "cordova-common" {
     name: string;
     version: string;
     description: string;
+    _et: ElementTree;
   }
 }
 

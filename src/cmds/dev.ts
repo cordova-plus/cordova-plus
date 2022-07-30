@@ -1,11 +1,16 @@
 import browserSync from "browser-sync";
+import chokidar from "chokidar";
 import cordovaLib from "cordova-lib";
+import { getInstalledPlugins } from "cordova-lib/src/cordova/plugin/util.js";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
 import { getPlatformWwwRoot, platforms } from "cordova-serve/src/util.js";
 import et from "elementtree";
 import { execa } from "execa";
+import glob from "fast-glob";
+import fse from "fs-extra";
 import assert from "node:assert";
 import http from "node:http";
+import path from "node:path";
 import serveHandler from "serve-handler";
 import onExit from "signal-exit";
 import { Logger } from "tslog";
@@ -26,8 +31,10 @@ function loadCordovaConfig() {
   return new cordovaLib.configparser(xml);
 }
 
+type Cfg = ReturnType<typeof loadCordovaConfig>;
+
 function updateCordovaConfig(
-  cfg: ReturnType<typeof loadCordovaConfig>,
+  cfg: Cfg,
   opts: { src: string; id?: string } | null,
 ) {
   const el = cfg.doc.find("content");
@@ -123,6 +130,84 @@ function resolvePlatform(userAgent?: string): keyof platforms {
   return "browser";
 }
 
+async function copyFile(s: string, t: string) {
+  log.debug(`${s} -> ${t}`);
+  await fse.copyFile(s, t);
+}
+
+async function syncLocalPlugins(cfg: Cfg) {
+  const cwd = process.cwd();
+  const installedPlugins = await getInstalledPlugins(cwd);
+
+  const [iosPluginsDir] = await glob("platforms/ios/*/Plugins", {
+    onlyDirectories: true,
+    cwd,
+  });
+
+  const syncFiles = new Map<string, string>();
+  for (const p of cfg.getPlugins()) {
+    const info = installedPlugins.find((x) => x.id === p.name);
+    if (!info) continue;
+    if (!await fse.pathExists(p.spec)) continue;
+
+    for (const platform of info._et.findall("platform")) {
+      const platformName = platform.attrib["name"];
+      if (!platformName) continue;
+
+      for (const sourceFile of platform.findall("source-file")) {
+        const targetDir = sourceFile.attrib["target-dir"];
+        const src = sourceFile.attrib["src"];
+        switch (platformName) {
+          case "android": {
+            if (!targetDir || !src) continue;
+            const k = path.join(
+              targetDir.replace(
+                /^src\//,
+                "platforms/android/app/src/main/java/",
+              ),
+              path.basename(src),
+            );
+            syncFiles.set(k, path.join(p.spec, src));
+          }
+          case "ios": {
+            if (!iosPluginsDir || !src) continue;
+            const k = path.join(
+              iosPluginsDir,
+              p.name,
+              path.basename(src),
+            );
+            syncFiles.set(k, path.join(p.spec, src));
+          }
+          default:
+            continue;
+        }
+      }
+    }
+  }
+
+  for (const [k, v] of syncFiles) {
+    await copyFile(v, k);
+  }
+
+  const watcher = chokidar.watch(
+    [
+      "platforms/android/app/src/main/java",
+      iosPluginsDir,
+    ].filter(Boolean),
+    { cwd },
+  );
+  onExit(async () => {
+    await watcher.close();
+  });
+
+  watcher.on("change", async (p, stats) => {
+    const v = syncFiles.get(p);
+    if (!v) return;
+
+    await copyFile(p, v);
+  });
+}
+
 export default {
   command: "dev",
   describe: "Run live reload server",
@@ -212,5 +297,7 @@ export default {
         log.info("Ready for dev");
       },
     );
+
+    await syncLocalPlugins(cfg);
   },
 } as CommandModule<{}, { id?: string; verbose: number }>;
