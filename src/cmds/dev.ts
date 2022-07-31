@@ -226,6 +226,10 @@ export default {
     );
   },
   async handler(opts) {
+    const minLevel = (["info", "debug", "trace", "silly"] as const)[opts.verbose] ??
+      "silly";
+    log.setSettings({ minLevel });
+
     const cfg = loadCordovaConfig();
 
     const bs = browserSync.create();
