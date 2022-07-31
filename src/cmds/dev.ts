@@ -1,7 +1,6 @@
 import browserSync from "browser-sync";
 import chokidar from "chokidar";
 import cordovaLib from "cordova-lib";
-import { getInstalledPlugins } from "cordova-lib/src/cordova/plugin/util.js";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
 import { getPlatformWwwRoot, platforms } from "cordova-serve/src/util.js";
 import et from "elementtree";
@@ -16,6 +15,8 @@ import onExit from "signal-exit";
 import { Logger } from "tslog";
 import uaParse from "ua-parser-js";
 import type { CommandModule } from "yargs";
+import { loadPackageJson } from "./info.js";
+import { getPlugins } from "./update.js";
 
 const log = new Logger({
   displayFilePath: "hidden",
@@ -137,20 +138,24 @@ async function copyFile(s: string, t: string) {
 
 async function syncLocalPlugins(cfg: Cfg) {
   const cwd = process.cwd();
-  const installedPlugins = await getInstalledPlugins(cwd);
 
   const [iosPluginsDir] = await glob("platforms/ios/*/Plugins", {
     onlyDirectories: true,
     cwd,
   });
 
+  const pkg = await loadPackageJson(cwd);
+  const deps = { ...pkg.content.dependencies, ...pkg.content.devDependencies };
   const syncFiles = new Map<string, string>();
-  for (const p of cfg.getPlugins()) {
-    const info = installedPlugins.find((x) => x.id === p.name);
-    if (!info) continue;
-    if (!await fse.pathExists(p.spec)) continue;
 
-    for (const platform of info._et.findall("platform")) {
+  for (const plugin of await getPlugins(cwd)) {
+    const pluginDir: string | undefined = deps[plugin.name]?.replace(
+      /^file:/,
+      "",
+    );
+    if (!pluginDir || !await fse.pathExists(pluginDir)) continue;
+
+    for (const platform of plugin._et.findall("platform")) {
       const platformName = platform.attrib["name"];
       if (!platformName) continue;
 
@@ -167,16 +172,16 @@ async function syncLocalPlugins(cfg: Cfg) {
               ),
               path.basename(src),
             );
-            syncFiles.set(k, path.join(p.spec, src));
+            syncFiles.set(k, path.join(pluginDir, src));
           }
           case "ios": {
             if (!iosPluginsDir || !src) continue;
             const k = path.join(
               iosPluginsDir,
-              p.name,
+              plugin.name,
               path.basename(src),
             );
-            syncFiles.set(k, path.join(p.spec, src));
+            syncFiles.set(k, path.join(pluginDir, src));
           }
           default:
             continue;

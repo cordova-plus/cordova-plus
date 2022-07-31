@@ -6,8 +6,8 @@ import type { CommandModule } from "yargs";
 import { loadPackageJson } from "./info.js";
 import { savePackageJson } from "./fmt.js";
 
-export async function getPlugins() {
-  const installedPlugins = await getInstalledPlugins(".");
+export async function getPlugins(projectRoot = ".") {
+  const installedPlugins = await getInstalledPlugins(projectRoot);
   const plugins: Array<
     PluginInfo & { pkg?: { name: string; version: string } }
   > = await Promise
