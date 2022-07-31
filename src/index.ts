@@ -33,7 +33,9 @@ async function cli() {
     .command(plugin)
     .command(update)
     .demandCommand()
+    .completion()
     .help()
+    .version()
     .argv;
 }
 
