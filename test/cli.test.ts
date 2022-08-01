@@ -13,10 +13,11 @@ Commands:
                                  nd libraries
   cordova-plus plugin <command>  Commands for plugin development
   cordova-plus update            Update plugins
+  cordova-plus completion        generate completion script
 
 Options:
-  --version  Show version number                                       [boolean]
   --cwd      Set current working directory                              [string]
-  --help     Show help                                                 [boolean]"
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]"
 `);
-}, 1000 * 30);
+}, 60_000);
