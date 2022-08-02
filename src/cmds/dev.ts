@@ -34,10 +34,10 @@ function loadCordovaConfig() {
 
 type Cfg = ReturnType<typeof loadCordovaConfig>;
 
-function updateCordovaConfig(
+async function updateCordovaConfig(
   cfg: Cfg,
   opts: { src: string; id?: string },
-): [boolean, () => void] {
+): Promise<[boolean, () => void]> {
   const el = cfg.doc.find("content");
   if (!el) return [false, () => {}];
   const root = cfg.doc.getroot();
@@ -105,6 +105,54 @@ function updateCordovaConfig(
 
   const updates = [updateSrc, updateNav, updateId];
 
+  const networkSecurityConfigPath =
+    "resources/android/xml/network_security_config.xml";
+  if (await fse.pathExists(networkSecurityConfigPath)) {
+    const networkSecurityConfig = et.parse(
+      await fse.readFile(networkSecurityConfigPath, "utf8"),
+    );
+    const doaminConfig = networkSecurityConfig.find("domain-config");
+
+    const save = () =>
+      fse.writeFileSync(
+        networkSecurityConfigPath,
+        networkSecurityConfig.write({ indent: 4 }),
+      );
+
+    if (doaminConfig) {
+      const domain = et.Element(
+        "domain",
+        {
+          includeSubdomains: "true",
+          dev: "true",
+        },
+      );
+      domain.text = new URL(opts.src).host;
+
+      const baseConfig = et.Element(
+        "base-config",
+        { cleartextTrafficPermitted: "true", dev: "true" },
+      );
+      const trustAnchors = et.Element("trust-anchors");
+      const certificates = et.Element("certificates", { src: "system" });
+      trustAnchors.append(certificates);
+      baseConfig.append(trustAnchors);
+
+      updates.push([
+        () => {
+          networkSecurityConfig.getroot().append(baseConfig);
+          doaminConfig.append(domain);
+          save();
+        },
+        () => {
+          networkSecurityConfig.getroot().remove(baseConfig);
+          doaminConfig.remove(domain);
+          save();
+        },
+      ]);
+    }
+  }
+
   const shouldUpdate = !a.src_;
   if (shouldUpdate) {
     // update for dev
@@ -113,10 +161,10 @@ function updateCordovaConfig(
   }
 
   return [shouldUpdate, () => {
-    if (a.src_) {
-      // restore
-      updates.map(([, f]) => f());
-    }
+    if (!a.src_) return;
+
+    // restore
+    updates.map(([, f]) => f());
     cfg.write();
   }];
 }
@@ -277,7 +325,7 @@ export default {
         );
 
         const externalUrl = r.options.getIn(["urls", "external"]);
-        const [updated, restore] = updateCordovaConfig(cfg, {
+        const [updated, restore] = await updateCordovaConfig(cfg, {
           src: externalUrl,
           id: opts.id,
         });
