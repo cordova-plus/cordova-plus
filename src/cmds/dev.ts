@@ -36,10 +36,10 @@ type Cfg = ReturnType<typeof loadCordovaConfig>;
 
 function updateCordovaConfig(
   cfg: Cfg,
-  opts: { src: string; id?: string } | null,
-) {
+  opts: { src: string; id?: string },
+): [boolean, () => void] {
   const el = cfg.doc.find("content");
-  if (!el) return false;
+  if (!el) return [false, () => {}];
   const root = cfg.doc.getroot();
   const a = el.attrib;
 
@@ -105,19 +105,20 @@ function updateCordovaConfig(
 
   const updates = [updateSrc, updateNav, updateId];
 
-  if (opts) {
+  const shouldUpdate = !a.src_;
+  if (shouldUpdate) {
     // update for dev
-    if (a.src_) return;
     updates.map(([f]) => f());
-  } else if (a.src_) {
-    // restore
-    updates.map(([, f]) => f());
-  } else {
-    return false;
+    cfg.write();
   }
 
-  cfg.write();
-  return true;
+  return [shouldUpdate, () => {
+    if (a.src_) {
+      // restore
+      updates.map(([, f]) => f());
+    }
+    cfg.write();
+  }];
 }
 
 function resolvePlatform(userAgent?: string): keyof platforms {
@@ -226,8 +227,9 @@ export default {
     );
   },
   async handler(opts) {
-    const minLevel = (["info", "debug", "trace", "silly"] as const)[opts.verbose] ??
-      "silly";
+    const minLevel =
+      (["info", "debug", "trace", "silly"] as const)[opts.verbose] ??
+        "silly";
     log.setSettings({ minLevel });
 
     const cfg = loadCordovaConfig();
@@ -275,13 +277,13 @@ export default {
         );
 
         const externalUrl = r.options.getIn(["urls", "external"]);
-        const updated = updateCordovaConfig(cfg, {
+        const [updated, restore] = updateCordovaConfig(cfg, {
           src: externalUrl,
           id: opts.id,
         });
 
         onExit(() => {
-          updateCordovaConfig(cfg, null);
+          restore();
         });
 
         if (updated) {
