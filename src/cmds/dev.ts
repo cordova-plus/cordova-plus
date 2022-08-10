@@ -311,12 +311,18 @@ export default {
         const platformDirs = new Map<string | undefined, string>();
         r.addMiddleware(
           "*",
-          (req: http.IncomingMessage, res: http.ServerResponse) => {
+          async (req: http.IncomingMessage, res: http.ServerResponse) => {
             const userAgent = req.headers["user-agent"];
             let platformDir = platformDirs.get(userAgent);
             if (platformDir === undefined) {
               const platform = resolvePlatform(userAgent);
               platformDir = getPlatformWwwRoot(".", platform);
+              if (!await fse.pathExists(platformDir)) {
+                const d = platformDir.replace("assets", "app/src/main/assets");
+                if (await fse.pathExists(d)) {
+                  platformDir = d;
+                }
+              }
               platformDirs.set(userAgent, platformDir);
             }
             log.info(`Serve ${req.url} from ${platformDir}`);
