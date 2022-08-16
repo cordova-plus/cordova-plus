@@ -262,6 +262,17 @@ async function syncLocalPlugins(cfg: Cfg) {
   });
 }
 
+export async function getPlatformWwwDir(platform: string, rootDir = ".") {
+  const platformDir = getPlatformWwwRoot(rootDir, platform);
+  if (!await fse.pathExists(platformDir)) {
+    const d = platformDir.replace("assets", "app/src/main/assets");
+    if (await fse.pathExists(d)) {
+      return d;
+    }
+  }
+  return platformDir;
+}
+
 export default {
   command: "dev",
   describe: "Run live reload server",
@@ -316,13 +327,7 @@ export default {
             let platformDir = platformDirs.get(userAgent);
             if (platformDir === undefined) {
               const platform = resolvePlatform(userAgent);
-              platformDir = getPlatformWwwRoot(".", platform);
-              if (!await fse.pathExists(platformDir)) {
-                const d = platformDir.replace("assets", "app/src/main/assets");
-                if (await fse.pathExists(d)) {
-                  platformDir = d;
-                }
-              }
+              platformDir = await getPlatformWwwDir(platform);
               platformDirs.set(userAgent, platformDir);
             }
             log.info(`Serve ${req.url} from ${platformDir}`);

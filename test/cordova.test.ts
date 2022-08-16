@@ -4,6 +4,8 @@ import fse from "fs-extra";
 import path from "node:path";
 import { temporaryDirectory } from "tempy";
 
+import { getPlatformWwwDir } from "../src/cmds/dev";
+
 [10, 11].forEach((v) => {
   describe(`cordova@${v}`, () => {
     jest.setTimeout(600_000);
@@ -33,7 +35,7 @@ import { temporaryDirectory } from "tempy";
       expect(await fse.pathExists(projectDir)).toBe(true);
     });
 
-    ["android"].forEach((platform) => {
+    ["android", "ios"].slice(0, 1).forEach((platform) => {
       it(platform, async () => {
         const platformDir = path.join(projectDir, "platforms", platform);
         expect(await fse.pathExists(platformDir)).toBe(false);
@@ -45,21 +47,18 @@ import { temporaryDirectory } from "tempy";
         ], { cwd: projectDir, stdio });
         expect(await fse.pathExists(platformDir)).toBe(true);
       });
-    });
 
-    it("prepare", async () => {
-      await execa(cordovaBin, [
-        "prepare",
-      ], { cwd: projectDir, stdio });
+      it("prepare", async () => {
+        await execa(cordovaBin, [
+          "prepare",
+          platform,
+        ], { cwd: projectDir, stdio });
 
-      expect(
-        await fse.pathExists(
-          path.join(
-            projectDir,
-            "platforms/android/app/src/main/assets/www/cordova.js",
-          ),
-        ),
-      ).toBe(true);
+        const d = await getPlatformWwwDir(platform, projectDir);
+        expect(
+          await fse.pathExists(path.join(d, "cordova.js")),
+        ).toBe(true);
+      });
     });
   });
 });
