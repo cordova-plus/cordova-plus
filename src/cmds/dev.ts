@@ -169,7 +169,7 @@ async function updateCordovaConfig(
   }];
 }
 
-function resolvePlatform(userAgent?: string): keyof platforms {
+function resolvePlatform(userAgent?: string) {
   const ua = uaParse(userAgent);
   const platform = ua.os.name?.toLowerCase();
   switch (platform) {
