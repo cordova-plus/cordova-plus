@@ -35,29 +35,31 @@ import { getPlatformWwwDir } from "../src/cmds/dev";
       expect(await fse.pathExists(projectDir)).toBe(true);
     });
 
-    ["android", "ios"].slice(0, 1).forEach((platform) => {
-      it(platform, async () => {
-        const platformDir = path.join(projectDir, "platforms", platform);
-        expect(await fse.pathExists(platformDir)).toBe(false);
+    ["android", "ios", "browser"].forEach((platform) => {
+      describe(platform, () => {
+        it("add", async () => {
+          const platformDir = path.join(projectDir, "platforms", platform);
+          expect(await fse.pathExists(platformDir)).toBe(false);
 
-        await execa(cordovaBin, [
-          "platform",
-          "add",
-          platform,
-        ], { cwd: projectDir, stdio });
-        expect(await fse.pathExists(platformDir)).toBe(true);
-      });
+          await execa(cordovaBin, [
+            "platform",
+            "add",
+            platform,
+          ], { cwd: projectDir, stdio });
+          expect(await fse.pathExists(platformDir)).toBe(true);
+        });
 
-      it("prepare", async () => {
-        await execa(cordovaBin, [
-          "prepare",
-          platform,
-        ], { cwd: projectDir, stdio });
+        it("prepare", async () => {
+          await execa(cordovaBin, [
+            "prepare",
+            platform,
+          ], { cwd: projectDir, stdio });
 
-        const d = await getPlatformWwwDir(platform, projectDir);
-        expect(
-          await fse.pathExists(path.join(d, "cordova.js")),
-        ).toBe(true);
+          const d = await getPlatformWwwDir(platform, projectDir);
+          expect(
+            await fse.pathExists(path.join(d, "cordova.js")),
+          ).toBe(true);
+        });
       });
     });
   });
