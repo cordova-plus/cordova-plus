@@ -23,11 +23,10 @@ const log = new Logger({
   displayFunctionName: false,
 });
 
-function loadCordovaConfig() {
-  const rootDir = cordovaUtil.getProjectRoot();
+export function loadCordovaConfig(rootDir = cordovaUtil.getProjectRoot()) {
   const xml = cordovaUtil.projectConfig(rootDir);
   if (xml === false) {
-    throw new Error();
+    throw new Error("fail to load config.xml");
   }
   return new cordovaLib.configparser(xml);
 }
