@@ -10,7 +10,7 @@ import { getPlatformWwwDir, loadCordovaConfig } from "../src/cmds/dev";
     jest.setTimeout(600_000);
 
     const rootDir = temporaryDirectory({ prefix: `test-cordova${v}-` });
-    const stdio: StdioOption = "inherit";
+    const stdio: StdioOption = process.env.DEBUG_TEST ? "inherit" : "ignore";
     const appId = "com.example.hello";
 
     const cordovaBin = path.join(rootDir, "node_modules/.bin/cordova");
