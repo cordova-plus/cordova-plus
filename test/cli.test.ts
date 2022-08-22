@@ -20,4 +20,4 @@ Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]"
 `);
-}, 60_000);
+}, 120_000);
