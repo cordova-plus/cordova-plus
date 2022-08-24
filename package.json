@@ -94,7 +94,7 @@
       "clean": "if-file-deleted",
       "files": [
         "src/**/*.ts",
-        "tsconfig.json"
+        "*.json"
       ],
       "output": [
         "lib/**",
