@@ -33,16 +33,15 @@ export function loadCordovaConfig(rootDir = cordovaUtil.getProjectRoot()) {
 
 type Cfg = ReturnType<typeof loadCordovaConfig>;
 
-async function updateCordovaConfig(
+export async function updateCordovaConfig(
   cfg: Cfg,
   opts: { src: string; id?: string },
 ): Promise<[boolean, () => void]> {
   const el = cfg.doc.find("content");
   if (!el) return [false, () => {}];
+
   const root = cfg.doc.getroot();
   const a = el.attrib;
-
-  const elNav = cfg.doc.findall("./allow-navigation").find((e) => e.attrib.dev);
 
   const updateSrc = [
     () => {
@@ -86,9 +85,12 @@ async function updateCordovaConfig(
     },
   ];
 
+  const findAllowNavigationElm = () =>
+    cfg.doc.findall("./allow-navigation").find((e) => e.attrib.dev);
+
   const updateNav = [
     () => {
-      if (!elNav) {
+      if (!findAllowNavigationElm()) {
         et.SubElement(root, "allow-navigation", {
           href: "http://*/*",
           dev: "true",
@@ -96,8 +98,9 @@ async function updateCordovaConfig(
       }
     },
     () => {
+      const elNav = findAllowNavigationElm();
       if (elNav) {
-        cfg.doc.getroot().remove(elNav);
+        root.remove(elNav);
       }
     },
   ];

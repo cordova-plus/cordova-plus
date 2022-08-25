@@ -3,7 +3,11 @@ import { execa, StdioOption } from "execa";
 import fse from "fs-extra";
 import path from "node:path";
 import { temporaryDirectory } from "tempy";
-import { getPlatformWwwDir, loadCordovaConfig } from "../src/cmds/dev";
+import {
+  getPlatformWwwDir,
+  loadCordovaConfig,
+  updateCordovaConfig,
+} from "../src/cmds/dev";
 
 [10, 11].forEach((v) => {
   describe(`cordova@${v}`, () => {
@@ -35,10 +39,36 @@ import { getPlatformWwwDir, loadCordovaConfig } from "../src/cmds/dev";
       expect(await fse.pathExists(projectDir)).toBe(true);
     });
 
-    it("load config", () => {
-      const cfg = loadCordovaConfig(projectDir);
-      const root = cfg.doc.getroot();
-      expect(root.attrib.id).toBe(appId);
+    describe("config", () => {
+      let cfg: ReturnType<typeof loadCordovaConfig>;
+
+      const readConfigXml = () =>
+        fse.readFile(
+          path.join(projectDir, "config.xml"),
+          "utf8",
+        );
+
+      beforeAll(() => {
+        cfg = loadCordovaConfig(projectDir);
+      });
+
+      it("loaded", () => {
+        const root = cfg.doc.getroot();
+        expect(root.attrib.id).toBe(appId);
+      });
+
+      it("updateCordovaConfig()", async () => {
+        const s1 = await readConfigXml();
+
+        const [updated, restore] = await updateCordovaConfig(cfg, {
+          src: "test",
+        });
+        expect(updated).toBe(true);
+        expect(await readConfigXml()).not.toBe(s1);
+
+        restore();
+        expect(await readConfigXml()).toBe(s1);
+      });
     });
 
     ["android", "ios", "browser"].forEach((platform) => {
