@@ -35,8 +35,10 @@ type Cfg = ReturnType<typeof loadCordovaConfig>;
 
 export async function updateCordovaConfig(
   cfg: Cfg,
-  opts: { src: string; id?: string },
+  opts: { src: string; id?: string; cwd?: string },
 ): Promise<[boolean, () => void]> {
+  const cwd = opts.cwd ?? ".";
+
   const el = cfg.doc.find("content");
   if (!el) return [false, () => {}];
 
@@ -107,8 +109,49 @@ export async function updateCordovaConfig(
 
   const updates = [updateSrc, updateNav, updateId];
 
-  const networkSecurityConfigPath =
-    "resources/android/xml/network_security_config.xml";
+  const androidManifestPath = path.join(
+    cwd,
+    "platforms/android/app/src/main/AndroidManifest.xml",
+  );
+  if (await fse.pathExists(androidManifestPath)) {
+    const androidManifest = et.parse(
+      await fse.readFile(androidManifestPath, "utf8"),
+    );
+    const applicationEl = androidManifest.find("application");
+
+    const save = () =>
+      fse.writeFileSync(
+        androidManifestPath,
+        androidManifest.write({ indent: 4 }),
+      );
+
+    if (applicationEl) {
+      const k = "android:usesCleartextTraffic";
+      const k2 = "usesCleartextTraffic_";
+
+      updates.push([
+        () => {
+          applicationEl.attrib[k2] = applicationEl.attrib[k];
+          applicationEl.attrib[k] = "true";
+          save();
+        },
+        () => {
+          if (applicationEl.attrib[k2] === "undefined") {
+            delete applicationEl.attrib[k];
+          } else {
+            applicationEl.attrib[k] = applicationEl.attrib[k2];
+          }
+          delete applicationEl.attrib[k2];
+          save();
+        },
+      ]);
+    }
+  }
+
+  const networkSecurityConfigPath = path.join(
+    cwd,
+    "resources/android/xml/network_security_config.xml",
+  );
   if (await fse.pathExists(networkSecurityConfigPath)) {
     const networkSecurityConfig = et.parse(
       await fse.readFile(networkSecurityConfigPath, "utf8"),
@@ -155,7 +198,7 @@ export async function updateCordovaConfig(
     }
   }
 
-  const shouldUpdate = !a.src_;
+  const shouldUpdate = !a.src_ || true;
   if (shouldUpdate) {
     // update for dev
     updates.map(([f]) => f());
@@ -164,6 +207,8 @@ export async function updateCordovaConfig(
 
   return [shouldUpdate, () => {
     if (!a.src_) return;
+
+    log.info("Restore config...");
 
     // restore
     updates.map(([, f]) => f());
