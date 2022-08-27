@@ -338,6 +338,11 @@ export default {
         "silly";
     log.setSettings({ minLevel });
 
+    process.on("SIGINT", () => {
+      console.log();
+      process.exit();
+    });
+
     const cfg = loadCordovaConfig();
 
     const bs = browserSync.create();
@@ -390,6 +395,7 @@ export default {
 
         onExit(() => {
           restore();
+          log.info("Done");
         });
 
         if (updated) {
