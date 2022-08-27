@@ -131,6 +131,7 @@ export async function updateCordovaConfig(
 
       updates.push([
         () => {
+          if (applicationEl.attrib[k2]) return;
           applicationEl.attrib[k2] = applicationEl.attrib[k];
           applicationEl.attrib[k] = "true";
           save();
