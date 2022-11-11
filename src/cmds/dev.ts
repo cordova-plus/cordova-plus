@@ -2,7 +2,7 @@ import browserSync from "browser-sync";
 import chokidar from "chokidar";
 import cordovaLib from "cordova-lib";
 import cordovaUtil from "cordova-lib/src/cordova/util.js";
-import { getPlatformWwwRoot, platforms } from "cordova-serve/src/util.js";
+import { getPlatformWwwRoot } from "cordova-serve/src/util.js";
 import et from "elementtree";
 import { execa } from "execa";
 import glob from "fast-glob";
@@ -10,17 +10,20 @@ import fse from "fs-extra";
 import assert from "node:assert";
 import http from "node:http";
 import path from "node:path";
+import pino from "pino";
 import serveHandler from "serve-handler";
 import onExit from "signal-exit";
-import { Logger } from "tslog";
 import uaParse from "ua-parser-js";
 import type { CommandModule } from "yargs";
 import { loadPackageJson } from "./info.js";
 import { getPlugins } from "./update.js";
 
-const log = new Logger({
-  displayFilePath: "hidden",
-  displayFunctionName: false,
+const log = pino({
+  transport: {
+    pipeline: [{
+      target: "pino-pretty",
+    }],
+  },
 });
 
 export function loadCordovaConfig(rootDir = cordovaUtil.getProjectRoot()) {
@@ -334,10 +337,8 @@ export default {
     );
   },
   async handler(opts) {
-    const minLevel =
-      (["info", "debug", "trace", "silly"] as const)[opts.verbose] ??
-        "silly";
-    log.setSettings({ minLevel });
+    log.level = (["info", "debug", "trace", "silly"] as const)[opts.verbose] ??
+      "silly";
 
     process.on("SIGINT", () => {
       console.log();
