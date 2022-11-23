@@ -17,5 +17,5 @@ describe("test-plugin", () => {
 
   it("test", async () => {
     await execa(cli, ["plugin", "test"], { cwd: pluginDir });
-  }, 60_000);
+  }, 120_000);
 });
