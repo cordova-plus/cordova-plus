@@ -47,6 +47,12 @@ declare module "cordova-common" {
     version: string;
     description: string;
     _et: ElementTree;
+
+    constructor(dirname: string);
+  }
+
+  export class PluginInfoProvider {
+    get(dirName: string): PluginInfo;
   }
 }
 

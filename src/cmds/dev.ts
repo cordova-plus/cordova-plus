@@ -18,6 +18,8 @@ import type { CommandModule } from "yargs";
 import { loadPackageJson } from "./info.js";
 import { getPlugins } from "./update.js";
 
+const { PluginInfo } = cordovaLib;
+
 const log = pino({
   transport: {
     pipeline: [{
@@ -254,8 +256,9 @@ async function syncLocalPlugins(cfg: Cfg) {
       "",
     );
     if (!pluginDir || !await fse.pathExists(pluginDir)) continue;
+    const pluginInfo = new PluginInfo(pluginDir);
 
-    for (const platform of plugin._et.findall("platform")) {
+    for (const platform of pluginInfo._et.findall("platform")) {
       const platformName = platform.attrib["name"];
       if (!platformName) continue;
 
