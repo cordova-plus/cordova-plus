@@ -234,7 +234,7 @@ function resolvePlatform(userAgent?: string) {
 }
 
 async function copyFile(s: string, t: string) {
-  log.debug(`${s} -> ${t}`);
+  log.debug({ source: s, target: t }, "Copy file");
   await fse.copyFile(s, t);
 }
 
