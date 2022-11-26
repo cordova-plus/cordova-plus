@@ -38,6 +38,46 @@ export function loadCordovaConfig(rootDir = cordovaUtil.getProjectRoot()) {
 
 type Cfg = ReturnType<typeof loadCordovaConfig>;
 
+async function patchAndroidManifest(cwd = ".") {
+  const androidManifestPath = path.join(
+    cwd,
+    "platforms/android/app/src/main/AndroidManifest.xml",
+  );
+  if (!await fse.pathExists(androidManifestPath)) return;
+
+  const androidManifest = et.parse(
+    await fse.readFile(androidManifestPath, "utf8"),
+  );
+  const applicationEl = androidManifest.find("application");
+  if (!applicationEl) return;
+
+  const save = () => {
+    log.debug("Save AndroidManifest.xml");
+    fse.writeFileSync(
+      androidManifestPath,
+      androidManifest.write({ indent: 4 }),
+    );
+  };
+
+  const k = "android:usesCleartextTraffic";
+  const k2 = "usesCleartextTraffic_";
+  if (applicationEl.attrib[k2]) return;
+
+  applicationEl.attrib[k2] = applicationEl.attrib[k];
+  applicationEl.attrib[k] = "true";
+  save();
+
+  return () => {
+    if (applicationEl.attrib[k2] === "undefined") {
+      delete applicationEl.attrib[k];
+    } else {
+      applicationEl.attrib[k] = applicationEl.attrib[k2];
+    }
+    delete applicationEl.attrib[k2];
+    save();
+  };
+}
+
 export async function updateCordovaConfig(
   cfg: Cfg,
   opts: { src: string; id?: string; cwd?: string },
@@ -113,46 +153,6 @@ export async function updateCordovaConfig(
   ];
 
   const updates = [updateSrc, updateNav, updateId];
-
-  const androidManifestPath = path.join(
-    cwd,
-    "platforms/android/app/src/main/AndroidManifest.xml",
-  );
-  if (await fse.pathExists(androidManifestPath)) {
-    const androidManifest = et.parse(
-      await fse.readFile(androidManifestPath, "utf8"),
-    );
-    const applicationEl = androidManifest.find("application");
-
-    const save = () =>
-      fse.writeFileSync(
-        androidManifestPath,
-        androidManifest.write({ indent: 4 }),
-      );
-
-    if (applicationEl) {
-      const k = "android:usesCleartextTraffic";
-      const k2 = "usesCleartextTraffic_";
-
-      updates.push([
-        () => {
-          if (applicationEl.attrib[k2]) return;
-          applicationEl.attrib[k2] = applicationEl.attrib[k];
-          applicationEl.attrib[k] = "true";
-          save();
-        },
-        () => {
-          if (applicationEl.attrib[k2] === "undefined") {
-            delete applicationEl.attrib[k];
-          } else {
-            applicationEl.attrib[k] = applicationEl.attrib[k2];
-          }
-          delete applicationEl.attrib[k2];
-          save();
-        },
-      ]);
-    }
-  }
 
   const networkSecurityConfigPath = path.join(
     cwd,
@@ -398,11 +398,6 @@ export default {
           id: opts.id,
         });
 
-        onExit(() => {
-          restore();
-          log.info("Done");
-        });
-
         if (updated) {
           log.info("Preparing project...");
           await execa("cordova", [
@@ -423,6 +418,14 @@ export default {
         }
 
         log.info("Ready for dev");
+
+        const restoreAndroidManifest = await patchAndroidManifest();
+
+        onExit(() => {
+          if (restoreAndroidManifest) restoreAndroidManifest();
+          restore();
+          log.info("Done");
+        });
       },
     );
 
