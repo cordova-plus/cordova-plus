@@ -88,8 +88,8 @@ async function patchNetworkSecurityConfig(host: string, cwd = ".") {
   const networkSecurityConfig = et.parse(
     await fse.readFile(networkSecurityConfigPath, "utf8"),
   );
-  const doaminConfig = networkSecurityConfig.find("domain-config");
-  if (!doaminConfig) return;
+  const domainConfig = networkSecurityConfig.find("domain-config");
+  if (!domainConfig) return;
 
   const save = () =>
     fse.writeFileSync(
@@ -116,12 +116,12 @@ async function patchNetworkSecurityConfig(host: string, cwd = ".") {
   baseConfig.append(trustAnchors);
 
   networkSecurityConfig.getroot().append(baseConfig);
-  doaminConfig.append(domain);
+  domainConfig.append(domain);
   save();
 
   return () => {
     networkSecurityConfig.getroot().remove(baseConfig);
-    doaminConfig.remove(domain);
+    domainConfig.remove(domain);
     save();
   };
 }
@@ -329,7 +329,7 @@ export default {
   builder(yargs) {
     return yargs.option("id", {
       type: "string",
-      desc: "Update widget id for developement",
+      desc: "Update widget id for development",
     }).example(
       "$0 dev --id .dev",
       "Development with suffix `.dev` as widget id",
@@ -393,7 +393,7 @@ export default {
           src: externalUrl,
           id: opts.id,
         });
-        const retoreNetworkSecurityConfig = await patchNetworkSecurityConfig(
+        const restoreNetworkSecurityConfig = await patchNetworkSecurityConfig(
           new URL(externalUrl).host,
         );
 
@@ -421,7 +421,7 @@ export default {
         log.info("Ready for dev");
 
         onExit(() => {
-          [restoreAndroidManifest, retoreNetworkSecurityConfig, restore].map((
+          [restoreAndroidManifest, restoreNetworkSecurityConfig, restore].map((
             f,
           ) => f ? f() : undefined);
           log.info("Done");
