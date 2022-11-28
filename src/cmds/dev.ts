@@ -128,10 +128,8 @@ async function patchNetworkSecurityConfig(host: string, cwd = ".") {
 
 export async function updateCordovaConfig(
   cfg: Cfg,
-  opts: { src: string; id?: string; cwd?: string },
+  opts: { src: string; id?: string },
 ): Promise<[boolean, () => void]> {
-  const cwd = opts.cwd ?? ".";
-
   const el = cfg.doc.find("content");
   if (!el) return [false, () => {}];
 
@@ -202,11 +200,6 @@ export async function updateCordovaConfig(
 
   const updates = [updateSrc, updateNav, updateId];
 
-  const retoreNetworkSecurityConfig = await patchNetworkSecurityConfig(
-    new URL(opts.src).host,
-    cwd,
-  );
-
   const shouldUpdate = !a.src_ || true;
   if (shouldUpdate) {
     // update for dev
@@ -220,7 +213,6 @@ export async function updateCordovaConfig(
     log.info("Restore config...");
 
     // restore
-    if (retoreNetworkSecurityConfig) retoreNetworkSecurityConfig();
     updates.map(([, f]) => f());
     cfg.write();
   }];
@@ -401,6 +393,9 @@ export default {
           src: externalUrl,
           id: opts.id,
         });
+        const retoreNetworkSecurityConfig = await patchNetworkSecurityConfig(
+          new URL(externalUrl).host,
+        );
 
         if (updated) {
           log.info("Preparing project...");
@@ -421,13 +416,14 @@ export default {
           });
         }
 
-        log.info("Ready for dev");
-
         const restoreAndroidManifest = await patchAndroidManifest();
 
+        log.info("Ready for dev");
+
         onExit(() => {
-          if (restoreAndroidManifest) restoreAndroidManifest();
-          restore();
+          [restoreAndroidManifest, retoreNetworkSecurityConfig, restore].map((
+            f,
+          ) => f ? f() : undefined);
           log.info("Done");
         });
       },
