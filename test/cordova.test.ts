@@ -1,5 +1,5 @@
 import { afterAll, expect, it, jest } from "@jest/globals";
-import { execa, StdioOption } from "execa";
+import { StdioOption, execa } from "execa";
 import fse from "fs-extra";
 import path from "node:path";
 import { temporaryDirectory } from "tempy";
@@ -9,7 +9,7 @@ import {
   updateCordovaConfig,
 } from "../src/cmds/dev";
 
-[10, 11].forEach((v) => {
+for (const v of [11, 10]) {
   describe(`cordova@${v}`, () => {
     jest.setTimeout(600_000);
 
@@ -99,4 +99,4 @@ import {
       });
     });
   });
-});
+}

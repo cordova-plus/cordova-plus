@@ -12,7 +12,7 @@ import http from "node:http";
 import path from "node:path";
 import pino from "pino";
 import serveHandler from "serve-handler";
-import onExit from "signal-exit";
+import { onExit } from "signal-exit";
 import uaParse from "ua-parser-js";
 import type { CommandModule } from "yargs";
 import { loadPackageJson } from "./info.js";
