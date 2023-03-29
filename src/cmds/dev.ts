@@ -265,10 +265,15 @@ async function syncLocalPlugins(cfg: Cfg) {
           case "android": {
             if (!targetDir || !src) continue;
             const k = path.join(
-              targetDir.replace(
-                /^src\//,
-                "platforms/android/app/src/main/java/",
-              ),
+              src.endsWith(".kt")
+                ? targetDir.replace(
+                  /^app\/src\/main\/kotlin\//,
+                  "platforms/android/app/src/main/kotlin/",
+                )
+                : targetDir.replace(
+                  /^src\//,
+                  "platforms/android/app/src/main/java/",
+                ),
               path.basename(src),
             );
             syncFiles.set(k, path.join(pluginDir, src));
@@ -295,7 +300,7 @@ async function syncLocalPlugins(cfg: Cfg) {
 
   const watcher = chokidar.watch(
     [
-      "platforms/android/app/src/main/java",
+      "platforms/android/app/src/main",
       iosPluginsDir,
     ].filter(Boolean),
     { cwd },
