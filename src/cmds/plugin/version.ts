@@ -1,7 +1,7 @@
 import { execa } from "execa";
 import fse from "fs-extra";
 import type { CommandModule } from "yargs";
-import { loadPackageJson } from "../info.js";
+import { loadPackageJson } from "../../info/loadPackageJson.js";
 
 async function updateCordovaPluginVersion(
   filename: string,

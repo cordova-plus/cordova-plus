@@ -1,13 +1,9 @@
 import envinfo from "@frat/envinfo";
-import PackageJson from "@npmcli/package-json";
-import { isOptedIn } from "cordova/src/telemetry.js";
 import clipboardy from "clipboardy";
+import { isOptedIn } from "cordova/src/telemetry.js";
 import type { CommandModule } from "yargs";
+import { loadPackageJson } from "../info/loadPackageJson.js";
 import { getPlugins } from "./update.js";
-
-export function loadPackageJson(root = "./") {
-  return PackageJson.load(root);
-}
 
 export default {
   command: "info",

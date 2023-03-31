@@ -1,8 +1,7 @@
 import { execa } from "execa";
 import semver from "semver";
 import type { CommandModule } from "yargs";
-import { loadPackageJson } from "./info.js";
-import { getPlugins } from "./update.js";
+import { getPlugins, loadPackageJson } from "../info/index.js";
 
 async function npmListDeps() {
   try {
@@ -39,7 +38,7 @@ export default {
 
       if (!semver.satisfies(pkg.version, versionSpec)) {
         console.warn(
-          `${pkg.name}@${pkg.version} does not satisify with version in package.json: ${versionSpec}`,
+          `${pkg.name}@${pkg.version} does not satisfy with version in package.json: ${versionSpec}`,
         );
         issues[`pkg:${pkg.name}`] = true;
       }

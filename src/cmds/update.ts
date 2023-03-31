@@ -3,7 +3,7 @@ import { getInstalledPlugins } from "cordova-lib/src/cordova/plugin/util.js";
 import { execa } from "execa";
 import _ from "lodash";
 import type { CommandModule } from "yargs";
-import { loadPackageJson } from "./info.js";
+import { loadPackageJson } from "../info/loadPackageJson.js";
 import { savePackageJson } from "./fmt.js";
 
 export async function getPlugins(projectRoot = ".") {

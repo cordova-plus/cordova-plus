@@ -15,7 +15,7 @@ import serveHandler from "serve-handler";
 import { onExit } from "signal-exit";
 import uaParse from "ua-parser-js";
 import type { CommandModule } from "yargs";
-import { loadPackageJson } from "./info.js";
+import { loadPackageJson } from "../info/loadPackageJson.js";
 import { getPlugins } from "./update.js";
 
 const { PluginInfo } = cordovaLib;
