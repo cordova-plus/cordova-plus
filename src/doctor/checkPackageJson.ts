@@ -19,7 +19,7 @@ export async function checkPackageJson() {
     if (!versionSpec || versionSpec.indexOf(":") > -1) continue;
 
     if (!semver.satisfies(pkg.version, versionSpec)) {
-      issues[`pkg:${pkg.name}`] =
+      issues[pkg.name] =
         `${pkg.name}@${pkg.version} does not satisfy with version in package.json: ${versionSpec}`;
     }
   }

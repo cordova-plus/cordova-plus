@@ -26,8 +26,7 @@ export async function checkInstalledPlugins() {
     if (!version) continue;
 
     if (version !== pkg.version) {
-      if (issues[`pkg:${pkg.name}`]) continue;
-      issues[`pkg:${pkg.name}`] =
+      issues[pkg.name] =
         `${pkg.name}@${pkg.version} is not match npm installed version: ${version}`;
     }
   }
