@@ -2,8 +2,7 @@ import envinfo from "@frat/envinfo";
 import clipboardy from "clipboardy";
 import { isOptedIn } from "cordova/src/telemetry.js";
 import type { CommandModule } from "yargs";
-import { loadPackageJson } from "../info/loadPackageJson.js";
-import { getPlugins } from "./update.js";
+import { getPlugins, loadPackageJson } from "../info/index.js";
 
 export default {
   command: "info",

@@ -1,28 +1,8 @@
-import type { PluginInfo } from "cordova-common";
-import { getInstalledPlugins } from "cordova-lib/src/cordova/plugin/util.js";
 import { execa } from "execa";
 import _ from "lodash";
 import type { CommandModule } from "yargs";
-import { loadPackageJson } from "../info/loadPackageJson.js";
+import { getPlugins, loadPackageJson } from "../info/index.js";
 import { savePackageJson } from "./fmt.js";
-
-export async function getPlugins(projectRoot = ".") {
-  const installedPlugins = await getInstalledPlugins(projectRoot);
-  const plugins: Array<
-    PluginInfo & { pkg?: { name: string; version: string } }
-  > = await Promise
-    .all(
-      installedPlugins.map(async (p) => {
-        const { content: pkg } = await loadPackageJson(p.dir).catch(
-          () => ({
-            content: undefined,
-          }),
-        );
-        return { ...p, pkg };
-      }),
-    );
-  return plugins;
-}
 
 function runCordova(args: string[], opts?: any) {
   const cwd = process.cwd();
