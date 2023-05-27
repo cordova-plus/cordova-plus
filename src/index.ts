@@ -40,3 +40,6 @@ async function cli() {
 }
 
 export default cli;
+
+export * from "./doctor/index.js";
+export * from "./info/index.js";
