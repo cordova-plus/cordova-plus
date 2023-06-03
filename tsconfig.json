@@ -1,18 +1,14 @@
 {
+  "extends": "@tsconfig/node16",
   "compilerOptions": {
     "incremental": true,
-    "target": "es2019",
-    "module": "esnext",
-    "moduleResolution": "node",
     "declaration": true,
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./lib",
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo"
   },
   "include": ["types.d.ts", "src/**/*.ts"],
   "ts-node": {

@@ -1,9 +1,9 @@
-import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import { execa } from "execa";
 import fse from "fs-extra";
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 import * as rollup from "rollup";
 import { temporaryFile } from "tempy";
 import type { CommandModule } from "yargs";

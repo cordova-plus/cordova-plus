@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",
+    "@tsconfig/node16": "^1.0.4",
     "@types/browser-sync": "^2.27.0",
     "@types/elementtree": "^0.1.1",
     "@types/fs-extra": "^11.0.1",
