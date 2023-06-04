@@ -3,6 +3,7 @@
   "compilerOptions": {
     "incremental": true,
     "declaration": true,
+    "module": "esnext",
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./lib",
