@@ -103,7 +103,7 @@
       ],
       "output": [
         "lib/**",
-        "*.tsbuildinfo"
+        "./node_modules/.cache/*.tsbuildinfo"
       ]
     },
     "test:jest": {

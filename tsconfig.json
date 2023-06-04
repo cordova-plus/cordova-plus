@@ -9,7 +9,7 @@
     "outDir": "./lib",
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo"
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
   },
   "include": ["types.d.ts", "src/**/*.ts"],
   "ts-node": {
