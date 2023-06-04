@@ -8,6 +8,7 @@ import * as rollup from "rollup";
 import { temporaryFile } from "tempy";
 import type { CommandModule } from "yargs";
 
+// @ts-ignore wrong type
 const require = createRequire(import.meta.url);
 
 export async function resolveTsconfig(tsconfig?: string) {

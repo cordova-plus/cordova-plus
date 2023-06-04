@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node lib/cli.js",
     "prepublishOnly": "npm run build",
-    "cli": "ts-node src/cli.ts",
+    "cli": "tsx src/cli.ts",
     "jest": "env NODE_OPTIONS=--experimental-vm-modules jest",
     "build": "wireit",
     "test:jest": "wireit",
@@ -73,6 +73,7 @@
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
     "tsd": "^0.28.1",
+    "tsx": "^3.12.7",
     "wireit": "^0.9.5"
   },
   "files": [
