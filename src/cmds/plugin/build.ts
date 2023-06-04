@@ -7,6 +7,7 @@ import { createRequire } from "node:module";
 import * as rollup from "rollup";
 import { temporaryFile } from "tempy";
 import type { CommandModule } from "yargs";
+import { cacheDir } from "../../cache.js";
 
 // @ts-ignore wrong type
 const require = createRequire(import.meta.url);
@@ -55,6 +56,7 @@ async function buildWww(tsconfig: string, opts: Options) {
       nodeResolve(),
       typescript({
         tsconfig,
+        cacheDir: cacheDir?.("www-ts"),
       }),
       commonjs(),
     ],
