@@ -6,6 +6,7 @@
     "noImplicitAny": false,
     "target": "es5",
     "lib": ["dom", "es2015"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "rootDir": "src/www"
   }
 }
