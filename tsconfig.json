@@ -1,9 +1,8 @@
 {
-  "extends": "@tsconfig/node16",
+  "extends": "@tsconfig/node18",
   "compilerOptions": {
     "incremental": true,
     "declaration": true,
-    "module": "esnext",
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./lib",
@@ -16,7 +15,6 @@
     "esm": true,
     "transpileOnly": true,
     "moduleTypes": {
-      "jest.config.ts": "cjs"
     }
   }
 }

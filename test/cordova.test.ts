@@ -1,8 +1,8 @@
-import { afterAll, expect, it, jest } from "@jest/globals";
-import { StdioOption, execa } from "execa";
+import {StdioOption, execa} from "execa";
 import fse from "fs-extra";
 import path from "node:path";
-import { temporaryDirectory } from "tempy";
+import {temporaryDirectory} from "tempy";
+import {afterAll, assert, beforeAll, describe, expect, it} from "vitest";
 import {
   getPlatformWwwDir,
   loadCordovaConfig,
@@ -11,9 +11,7 @@ import {
 
 for (const v of [11, 10]) {
   describe(`cordova@${v}`, () => {
-    jest.setTimeout(600_000);
-
-    const rootDir = temporaryDirectory({ prefix: `test-cordova${v}-` });
+    const rootDir = temporaryDirectory({prefix: `test-cordova${v}-`});
     const stdio: StdioOption = process.env.DEBUG_TEST ? "inherit" : "ignore";
     const appId = "com.example.hello";
 
@@ -25,17 +23,14 @@ for (const v of [11, 10]) {
     });
 
     it("install cordova", async () => {
-      await execa("npm", ["install", `cordova@^${v}`], { cwd: rootDir, stdio });
+      await execa("npm", ["install", `cordova@^${v}`], {cwd: rootDir, stdio});
       expect(await fse.pathExists(cordovaBin)).toBe(true);
     });
 
     it("create", async () => {
-      await execa(cordovaBin, [
-        "create",
-        projectDir,
-        appId,
-        "HelloWorld",
-      ], { stdio });
+      await execa(cordovaBin, ["create", projectDir, appId, "HelloWorld"], {
+        stdio,
+      });
       expect(await fse.pathExists(projectDir)).toBe(true);
     });
 
@@ -43,10 +38,7 @@ for (const v of [11, 10]) {
       let cfg: ReturnType<typeof loadCordovaConfig>;
 
       const readConfigXml = () =>
-        fse.readFile(
-          path.join(projectDir, "config.xml"),
-          "utf8",
-        );
+        fse.readFile(path.join(projectDir, "config.xml"), "utf8");
 
       beforeAll(() => {
         cfg = loadCordovaConfig(projectDir);
@@ -71,32 +63,29 @@ for (const v of [11, 10]) {
       });
     });
 
-    ["android", "ios", "browser"].forEach((platform) => {
+    ["android", "ios", "browser"].forEach(platform => {
       describe(platform, () => {
         it("add", async () => {
           const platformDir = path.join(projectDir, "platforms", platform);
           expect(await fse.pathExists(platformDir)).toBe(false);
 
-          await execa(cordovaBin, [
-            "platform",
-            "add",
-            platform,
-          ], { cwd: projectDir, stdio });
+          await execa(cordovaBin, ["platform", "add", platform], {
+            cwd: projectDir,
+            stdio,
+          });
           expect(await fse.pathExists(platformDir)).toBe(true);
         });
 
         it("prepare", async () => {
-          await execa(cordovaBin, [
-            "prepare",
-            platform,
-          ], { cwd: projectDir, stdio });
+          await execa(cordovaBin, ["prepare", platform], {
+            cwd: projectDir,
+            stdio,
+          });
 
           const d = await getPlatformWwwDir(platform, projectDir);
-          expect(
-            await fse.pathExists(path.join(d, "cordova.js")),
-          ).toBe(true);
+          expect(await fse.pathExists(path.join(d, "cordova.js"))).toBe(true);
         });
       });
     });
-  });
+  }, 600_000);
 }

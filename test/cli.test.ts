@@ -1,4 +1,5 @@
 import { execa } from "execa";
+import { expect, test } from 'vitest';
 
 test("cli", async () => {
   const p = await execa("./lib/cli.js", ["--help"], { stdout: "pipe" });

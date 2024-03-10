@@ -10,7 +10,7 @@ import fse from "fs-extra";
 import assert from "node:assert";
 import http from "node:http";
 import path from "node:path";
-import pino from "pino";
+import {pino} from "pino";
 import serveHandler from "serve-handler";
 import { onExit } from "signal-exit";
 import uaParse from "ua-parser-js";
@@ -304,8 +304,8 @@ async function syncLocalPlugins(cfg: Cfg) {
     ].filter(Boolean),
     { cwd },
   );
-  onExit(async () => {
-    await watcher.close();
+  onExit(() => {
+    Promise.resolve(watcher.close());
   });
 
   watcher.on("change", async (p, stats) => {

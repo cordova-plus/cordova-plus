@@ -1,6 +1,7 @@
 import { execa } from "execa";
 import { createRequire } from "node:module";
 import path from "node:path";
+import { assert, describe, expect, it } from 'vitest';
 
 const require = createRequire(import.meta.url);
 

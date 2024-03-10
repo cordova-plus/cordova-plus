@@ -54,10 +54,12 @@ async function buildWww(tsconfig: string, opts: Options) {
     ],
     plugins: [
       nodeResolve(),
+      // @ts-ignore wrong type
       typescript({
         tsconfig,
         cacheDir: cacheDir?.("www-ts"),
       }),
+      // @ts-ignore wrong type
       commonjs(),
     ],
     onwarn(warning) {
